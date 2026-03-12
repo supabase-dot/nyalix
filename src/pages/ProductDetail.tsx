@@ -174,7 +174,7 @@ const ProductDetail = () => {
               className="w-full sm:w-auto ml-2 inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-muted hover:bg-muted/80 text-foreground rounded-lg font-semibold transition-all"
             >
               <FileText className="w-5 h-5" />
-              Request Quote
+              {t('quote.openButton')}
             </button>
             
             <QuoteRequestModal 

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { X, Send, Building2, Mail, Phone, Globe, Package, MessageSquare } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface QuoteRequestModalProps {
   isOpen: boolean;
@@ -17,6 +19,8 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   productId = '',
   productName = '',
 }) => {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -42,6 +46,11 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
     }));
   };
 
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -55,7 +64,13 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       !formData.product ||
       formData.quantity < 1
     ) {
-      toast.error('Please fill in all required fields');
+      toast.error(t('quote.validationError'));
+      return;
+    }
+
+    // Email validation
+    if (!isValidEmail(formData.email)) {
+      toast.error(t('quote.emailValidationError'));
       return;
     }
 
@@ -76,11 +91,11 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       });
 
       if (error) {
-        toast.error(error.message || 'Failed to submit quote request');
+        toast.error(error.message || t('quote.submissionError'));
         return;
       }
 
-      toast.success('Quote request sent successfully! We will contact you soon.');
+      toast.success(t('quote.successMessage'));
       setFormData({
         name: '',
         company: '',
@@ -93,7 +108,7 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       });
       onClose();
     } catch (err) {
-      toast.error('An error occurred. Please try again.');
+      toast.error(t('quote.generalError'));
     } finally {
       setLoading(false);
     }
@@ -115,17 +130,18 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
           >
             {/* Header */}
             <div className="sticky top-0 bg-gradient-to-r from-primary/10 to-primary/5 border-b border-border px-6 py-4 flex items-center justify-between">
-              <div>
+              <div className={isRTL ? 'text-right' : ''}>
                 <h2 className="text-xl font-display font-bold text-foreground">
-                  Request a Quote
+                  {t('quote.title')}
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Get pricing for your B2B requirements
+                  {t('quote.subtitle')}
                 </p>
               </div>
               <button
                 onClick={onClose}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                className="p-2 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
+                aria-label={t('quote.close')}
               >
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -136,109 +152,115 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Full Name <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 ${isRTL ? 'text-right' : ''}`}>
+                    {t('quote.fullName')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="John Doe"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.fullNamePlaceholder')}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${isRTL ? 'text-right' : ''}`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Company */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Building2 className="w-4 h-4" />
-                    Company <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Building2 className="w-4 h-4 flex-shrink-0" />
+                    {t('quote.company')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="company"
                     value={formData.company}
                     onChange={handleChange}
-                    placeholder="Acme Corporation"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.companyPlaceholder')}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${isRTL ? 'text-right' : ''}`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    Email <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Mail className="w-4 h-4 flex-shrink-0" />
+                    {t('quote.email')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    placeholder="john@acme.com"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.emailPlaceholder')}
+                    dir="ltr"
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Phone className="w-4 h-4" />
-                    Phone <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Phone className="w-4 h-4 flex-shrink-0" />
+                    {t('quote.phone')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="tel"
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+1 (555) 000-0000"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.phonePlaceholder')}
+                    dir="ltr"
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Country */}
                 <div className="md:col-span-2 lg:col-span-1">
-                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Globe className="w-4 h-4" />
-                    Country <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Globe className="w-4 h-4 flex-shrink-0" />
+                    {t('quote.country')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="country"
                     value={formData.country}
                     onChange={handleChange}
-                    placeholder="United States"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.countryPlaceholder')}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${isRTL ? 'text-right' : ''}`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Product */}
                 <div className="md:col-span-2 lg:col-span-1">
-                  <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Package className="w-4 h-4" />
-                    Product <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                    <Package className="w-4 h-4 flex-shrink-0" />
+                    {t('quote.product')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     name="product"
                     value={formData.product}
                     onChange={handleChange}
-                    placeholder="Product name"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    placeholder={t('quote.productPlaceholder')}
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors ${isRTL ? 'text-right' : ''}`}
                     disabled={loading}
                   />
                 </div>
 
                 {/* Quantity */}
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Quantity <span className="text-red-500">*</span>
+                  <label className={`block text-sm font-medium text-foreground mb-2 ${isRTL ? 'text-right' : ''}`}>
+                    {t('quote.quantity')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="number"
@@ -246,7 +268,8 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                     value={formData.quantity}
                     onChange={handleChange}
                     min="1"
-                    className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
+                    dir="ltr"
+                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors`}
                     disabled={loading}
                   />
                 </div>
@@ -254,38 +277,39 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
 
               {/* Message */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4" />
-                  Additional Message
+                <label className={`block text-sm font-medium text-foreground mb-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse justify-end' : ''}`}>
+                  <MessageSquare className="w-4 h-4 flex-shrink-0" />
+                  {t('quote.message')}
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Tell us about your specific requirements, bulk discounts needed, etc."
+                  placeholder={t('quote.messagePlaceholder')}
                   rows={4}
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none"
+                  dir={isRTL ? 'rtl' : 'ltr'}
+                  className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors resize-none ${isRTL ? 'text-right' : ''}`}
                   disabled={loading}
                 />
               </div>
 
               {/* Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-border">
+              <div className={`flex gap-3 pt-4 border-t border-border ${isRTL ? 'flex-row-reverse' : ''}`}>
                 <button
                   type="button"
                   onClick={onClose}
                   className="flex-1 px-6 py-3 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-colors disabled:opacity-50"
                   disabled={loading}
                 >
-                  Cancel
+                  {t('quote.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-gradient-gold text-primary rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className={`flex-1 px-6 py-3 bg-gradient-gold text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                 >
-                  <Send className="w-4 h-4" />
-                  {loading ? 'Sending...' : 'Send Quote Request'}
+                  <Send className="w-4 h-4 flex-shrink-0" />
+                  {loading ? t('quote.sending') : t('quote.submit')}
                 </button>
               </div>
             </form>
