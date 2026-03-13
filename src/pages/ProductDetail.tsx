@@ -17,7 +17,6 @@ interface Review {
   rating: number;
   review_text: string;
   created_at: string;
-  profiles?: {full_name: string;};
 }
 
 const ProductDetail = () => {
@@ -50,12 +49,23 @@ const ProductDetail = () => {
 
   const fetchReviews = useCallback(async () => {
     setReviewsLoading(true);
-    const { data } = await supabase.
-    from('product_reviews').
-    select('*, profiles(full_name)').
-    eq('product_id', id).
-    order('created_at', { ascending: false });
-    setReviews(data as unknown as Review[] ?? []);
+    try {
+      const { data, error } = await supabase.
+      from('product_reviews').
+      select('*').
+      eq('product_id', id).
+      order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        setReviews([]);
+      } else {
+        setReviews(data as unknown as Review[] ?? []);
+      }
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+      setReviews([]);
+    }
     setReviewsLoading(false);
   }, [id]);
 
@@ -227,7 +237,7 @@ const ProductDetail = () => {
                         {(review.profiles?.full_name || 'U')[0].toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground text-sm">{review.profiles?.full_name || 'Verified Buyer'}</p>
+                        <p className="font-semibold text-foreground text-sm">Verified Buyer</p>
                         <StarRating value={review.rating} readonly size="sm" />
                       </div>
                     </div>
