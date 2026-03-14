@@ -45,10 +45,27 @@ class AdminErrorBoundary extends React.Component<{ children: React.ReactNode }, 
   }
 }
 
+interface ProductSpecification {
+  name_en: string;
+  name_ar: string;
+  value_en: string;
+  value_ar: string;
+}
+
 interface Product {
-  id: string;name: string;name_ar: string;description: string;description_ar: string;
-  category: string;category_ar: string;price: number;images: string[];in_stock: boolean;
-  stock_quantity: number;specifications: Record<string, string>;featured: boolean;
+  id: string;
+  name: string;
+  name_ar: string;
+  description: string;
+  description_ar: string;
+  category: string;
+  category_ar: string;
+  price: number;
+  images: string[];
+  in_stock: boolean;
+  stock_quantity: number;
+  specifications: ProductSpecification[];
+  featured: boolean;
 }
 
 interface Order {
@@ -137,6 +154,27 @@ const Admin = () => {
   const [categorySearch, setCategorySearch] = useState('');
   const [orderSearch, setOrderSearch] = useState('');
 
+  const normalizeSpecs = (specs: unknown): ProductSpecification[] => {
+    if (!specs) return [];
+    if (Array.isArray(specs)) {
+      const arr = specs as Array<Record<string, unknown>>;
+      return arr.map((s) => ({
+        name_en: String(s?.name_en ?? s?.name ?? ''),
+        name_ar: String(s?.name_ar ?? s?.name ?? ''),
+        value_en: String(s?.value_en ?? s?.value ?? ''),
+        value_ar: String(s?.value_ar ?? s?.value ?? ''),
+      }));
+    }
+
+    // Legacy object format: { key: value }
+    return Object.entries(specs).map(([key, val]) => ({
+      name_en: key,
+      name_ar: key,
+      value_en: String(val ?? ''),
+      value_ar: String(val ?? ''),
+    }));
+  };
+
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
@@ -154,7 +192,13 @@ const Admin = () => {
 
   const fetchProducts = useCallback(async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-    setProducts(data as unknown as Product[] ?? []);
+    const normalized = (data as unknown[] | null) ?? [];
+    setProducts(
+      normalized.map((p) => ({
+        ...p,
+        specifications: normalizeSpecs(p.specifications),
+      })) as Product[]
+    );
   }, []);
 
   const fetchOrders = useCallback(async () => {
@@ -242,7 +286,7 @@ const Admin = () => {
       images: editProduct.images || [],
       in_stock: editProduct.in_stock ?? true,
       stock_quantity: editProduct.stock_quantity ?? 0,
-      specifications: editProduct.specifications || {},
+      specifications: normalizeSpecs(editProduct.specifications),
       featured: editProduct.featured ?? false
     };
 
@@ -763,34 +807,84 @@ const Admin = () => {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <label className="block text-sm font-medium text-foreground">Specifications</label>
-                        <button type="button" onClick={() => {
-                      const specs = { ...(editProduct?.specifications || {}) };
-                      specs[''] = '';
-                      setEditProduct((prev) => ({ ...prev, specifications: specs }));
-                    }} className="text-xs text-accent hover:underline flex items-center gap-1"><Plus className="w-3 h-3" />Add Row</button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const specs = [...(editProduct?.specifications || [])];
+                            specs.push({ name_en: '', name_ar: '', value_en: '', value_ar: '' });
+                            setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                          }}
+                          className="text-xs text-accent hover:underline flex items-center gap-1"
+                        >
+                          <Plus className="w-3 h-3" />Add Row
+                        </button>
                       </div>
                       <div className="space-y-2">
-                        {Object.entries(editProduct?.specifications || {}).map(([key, val], idx) =>
-                    <div key={idx} className="flex gap-2">
-                            <input placeholder="Key (e.g. Weight)" value={key} onChange={(e) => {
-                        const specs = { ...(editProduct?.specifications || {}) };
-                        const entries = Object.entries(specs);
-                        entries[idx] = [e.target.value, val as string];
-                        setEditProduct((prev) => ({ ...prev, specifications: Object.fromEntries(entries) }));
-                      }} className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm" />
-                            <input placeholder="Value" value={val as string} onChange={(e) => {
-                        const specs = { ...(editProduct?.specifications || {}) };
-                        const entries = Object.entries(specs);
-                        entries[idx] = [key, e.target.value];
-                        setEditProduct((prev) => ({ ...prev, specifications: Object.fromEntries(entries) }));
-                      }} className="flex-1 px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm" />
-                            <button type="button" onClick={() => {
-                        const specs = { ...(editProduct?.specifications || {}) };
-                        delete specs[key];
-                        setEditProduct((prev) => ({ ...prev, specifications: specs }));
-                      }} className="text-destructive hover:text-destructive/80"><X className="w-4 h-4" /></button>
+                        {(editProduct?.specifications || []).map((spec, idx) => (
+                          <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
+                            <div>
+                              <label className="block text-xs font-medium text-foreground mb-1">Specification Name (EN)</label>
+                              <input
+                                value={spec.name_en}
+                                onChange={(e) => {
+                                  const specs = [...(editProduct?.specifications || [])];
+                                  specs[idx] = { ...specs[idx], name_en: e.target.value };
+                                  setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-foreground mb-1">Specification Name (AR)</label>
+                              <input
+                                value={spec.name_ar}
+                                onChange={(e) => {
+                                  const specs = [...(editProduct?.specifications || [])];
+                                  specs[idx] = { ...specs[idx], name_ar: e.target.value };
+                                  setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs font-medium text-foreground mb-1">Value (EN)</label>
+                              <input
+                                value={spec.value_en}
+                                onChange={(e) => {
+                                  const specs = [...(editProduct?.specifications || [])];
+                                  specs[idx] = { ...specs[idx], value_en: e.target.value };
+                                  setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm"
+                              />
+                            </div>
+                            <div className="flex items-end gap-2">
+                              <div className="flex-1">
+                                <label className="block text-xs font-medium text-foreground mb-1">Value (AR)</label>
+                                <input
+                                  value={spec.value_ar}
+                                  onChange={(e) => {
+                                    const specs = [...(editProduct?.specifications || [])];
+                                    specs[idx] = { ...specs[idx], value_ar: e.target.value };
+                                    setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                                  }}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-border bg-background text-foreground text-sm"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const specs = [...(editProduct?.specifications || [])];
+                                  specs.splice(idx, 1);
+                                  setEditProduct((prev) => ({ ...prev, specifications: specs }));
+                                }}
+                                className="text-destructive hover:text-destructive/80"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
                           </div>
-                    )}
+                        ))}
                       </div>
                     </div>
 
@@ -853,7 +947,7 @@ const Admin = () => {
                     {p.in_stock ? 'In Stock' : 'Out of Stock'}
                   </span>
                   <div className="flex gap-1">
-                    <button onClick={() => {setEditProduct(p);setShowForm(true);}} className="p-2 text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => {setEditProduct({ ...p, specifications: normalizeSpecs(p.specifications) });setShowForm(true);}} className="p-2 text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
                     <button onClick={() => deleteProduct(p.id)} className="p-2 text-destructive hover:text-destructive/80"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 </div>

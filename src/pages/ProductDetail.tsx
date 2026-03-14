@@ -128,7 +128,15 @@ const ProductDetail = () => {
   const name = language === 'ar' ? product.name_ar : product.name;
   const desc = language === 'ar' ? product.description_ar : product.description;
   const cat = language === 'ar' ? product.category_ar : product.category;
-  const specs = (product.specifications || {}) as Record<string, string>;
+
+  const specs = Array.isArray(product.specifications)
+    ? product.specifications
+    : Object.entries((product.specifications || {}) as Record<string, string>).map(([key, value]) => ({
+        name_en: key,
+        name_ar: key,
+        value_en: value,
+        value_ar: value,
+      }));
 
   return (
     <div className="pt-20 min-h-screen bg-background">
@@ -223,12 +231,16 @@ const ProductDetail = () => {
             <div className="mt-10">
               <h3 className="font-display font-semibold text-foreground text-lg mb-4">{t('products.specifications')}</h3>
               <div className="grid grid-cols-2 gap-3">
-                {Object.entries(specs).map(([key, value]) =>
-                    <div key={key} className="bg-muted rounded-lg p-4">
-                    <span className="text-xs text-muted-foreground uppercase tracking-wider">{key}</span>
-                    <p className="font-semibold text-foreground mt-1">{value}</p>
+                {specs.map((spec, idx) => (
+                  <div key={idx} className="bg-muted rounded-lg p-4">
+                    <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                      {language === 'ar' ? spec.name_ar : spec.name_en}
+                    </span>
+                    <p className="font-semibold text-foreground mt-1">
+                      {language === 'ar' ? spec.value_ar : spec.value_en}
+                    </p>
                   </div>
-                    )}
+                ))}
               </div>
             </div>
           </motion.div>
