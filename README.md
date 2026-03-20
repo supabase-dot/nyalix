@@ -10,7 +10,6 @@ The goal of this project is to provide a **professional digital storefront for h
 
 ---
 
-# Features
 
 ## User Features
 
