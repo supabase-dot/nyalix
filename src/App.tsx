@@ -42,7 +42,7 @@ const App = () => (
             <Sonner />
             <BrowserRouter>
               <Navbar />
-              <main className="min-h-screen">
+              <main className="min-h-screen pt-28">
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/about" element={<About />} />

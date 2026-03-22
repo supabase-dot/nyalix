@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import nyalixLogo from '@/assets/nyalix-logo.png';
 import ProductsDropdown from './ProductsDropdown';
 import { useCategories } from '@/hooks/useCategories';
+import TopBar from './TopBar';
 
 const Navbar = () => {
   const { t } = useTranslation();
@@ -35,7 +36,9 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith('/products/category/');
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-border">
+    <>
+      <TopBar />
+      <nav className="fixed top-8 left-0 right-0 z-50 bg-white shadow-sm border-b border-border">
       {/* Top bar */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20 gap-4">
@@ -225,6 +228,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
     </nav>
+    </>
   );
 };
 
