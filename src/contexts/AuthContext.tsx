@@ -15,6 +15,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string, phone: string, country: string) => Promise<{ error: AuthError | null }>;
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
+  updateProfile: (data: Partial<{ full_name: string; email: string; phone: string; country: string }>) => Promise<{ error: Error | null }>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -37,6 +39,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchProfile = async (userId: string) => {
     const { data } = await supabase.from('profiles').select('full_name, email, phone, country').eq('user_id', userId).maybeSingle();
     setProfile(data);
+  };
+
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
   };
 
   useEffect(() => {
@@ -78,7 +86,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: { full_name: fullName, phone, country },
       },
     });
+    // Refresh profile after signup
+    if (!error) {
+      setTimeout(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session?.user) {
+            fetchProfile(session.user.id);
+          }
+        });
+      }, 1000);
+    }
     return { error };
+  };
+
+  const updateProfile = async (data: Partial<{ full_name: string; email: string; phone: string; country: string }>) => {
+    if (!user) return { error: new Error('No user logged in') };
+    
+    try {
+      const { error } = await supabase.from('profiles').update(data).eq('user_id', user.id);
+      if (error) return { error };
+      
+      // Refresh profile after update
+      await refreshProfile();
+      return { error: null };
+    } catch (err) {
+      return { error: err instanceof Error ? err : new Error('Unknown error') };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
@@ -91,7 +124,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, userRole, profile, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, isAdmin, userRole, profile, signUp, signIn, signOut, updateProfile, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

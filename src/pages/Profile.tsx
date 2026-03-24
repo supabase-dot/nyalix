@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, Pencil, Save, X, Star, MessageSquare, FileText } from 'lucide-react';
+import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, X, Star, MessageSquare, FileText, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import StarRating from '@/components/StarRating';
 
@@ -176,16 +175,10 @@ const ReviewModal = ({
 const Profile = () => {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editPhone, setEditPhone] = useState('');
-  const [editCountry, setEditCountry] = useState('');
-  const [saving, setSaving] = useState(false);
   const [reviewModal, setReviewModal] = useState<{
     open: boolean;orderId: string;productId: string;productName: string;
   } | null>(null);
@@ -220,31 +213,8 @@ const Profile = () => {
     if (user) {fetchOrders();fetchReviews();fetchQuotes();}
   }, [user, fetchOrders, fetchReviews, fetchQuotes]);
 
-  useEffect(() => {
-    if (profile) {
-      setEditName(profile.full_name || '');
-      setEditPhone(profile.phone || '');
-      setEditCountry(profile.country || '');
-    }
-  }, [profile]);
-
   const getExistingReview = (orderId: string, productId: string) =>
   reviews.find((r) => r.order_id === orderId && r.product_id === productId);
-
-  const handleSaveProfile = async () => {
-    if (!user) return;
-    setSaving(true);
-    const { error } = await supabase.from('profiles').update({
-      full_name: editName,
-      phone: editPhone,
-      country: editCountry
-    }).eq('user_id', user.id);
-    setSaving(false);
-    if (error) {toast.error(error.message);return;}
-    toast.success('Profile updated successfully');
-    setEditing(false);
-    window.location.reload();
-  };
 
   const handleCancelOrder = async (orderId: string) => {
     if (!confirm('Are you sure you want to cancel this order?')) return;
@@ -291,57 +261,29 @@ const Profile = () => {
               </div>
               <div>
                 <h2 className="text-xl font-display font-bold text-foreground">{profile?.full_name || 'User'}</h2>
-                <p className="text-sm text-muted-foreground">{profile?.email}</p>
+                <p className="text-sm text-muted-foreground">{profile?.email || user?.email || 'No email'}</p>
+                {profile?.phone && <p className="text-sm text-muted-foreground">📞 {profile.phone}</p>}
+                {profile?.country && <p className="text-sm text-muted-foreground">🌍 {profile.country}</p>}
               </div>
             </div>
-            {!editing ?
-            <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-                <Pencil className="w-4 h-4" /> Edit Profile
-              </button> :
-
-            <div className="flex gap-2">
-                <button onClick={handleSaveProfile} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50">
-                  <Save className="w-4 h-4" /> {saving ? 'Saving...' : 'Save'}
-                </button>
-                <button onClick={() => setEditing(false)} className="flex items-center gap-2 px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">
-                  <X className="w-4 h-4" /> Cancel
-                </button>
-              </div>
-            }
+            <Link to="/settings" className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                <Settings className="w-4 h-4" /> Settings
+              </Link>
           </div>
 
-          {editing ?
+          {/* Profile Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Full Name</label>
-                <input type="text" value={editName} onChange={(e) => setEditName(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            {[
+              { label: 'Email', value: profile?.email || user?.email || '—' },
+              { label: 'Phone', value: profile?.phone || '—' },
+              { label: 'Total Orders', value: orders.length }
+            ].map((item, i) =>
+              <div key={i} className="bg-muted rounded-lg p-3">
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="font-semibold text-foreground truncate">{item.value}</p>
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Phone</label>
-                <input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Country</label>
-                <input type="text" value={editCountry} onChange={(e) => setEditCountry(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-              </div>
-            </div> :
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-              {[
-            { label: 'Phone', value: profile?.phone || '—' },
-            { label: 'Country', value: profile?.country || '—' },
-            { label: 'Total Orders', value: orders.length }].
-            map((item, i) =>
-            <div key={i} className="bg-muted rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">{item.label}</p>
-                  <p className="font-semibold text-foreground">{item.value}</p>
-                </div>
             )}
-            </div>
-          }
+          </div>
         </motion.div>
 
         {/* Orders */}

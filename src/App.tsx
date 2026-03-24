@@ -26,6 +26,7 @@ import Warranty from "./pages/Warranty";
 import Quality from "./pages/Quality";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
+import UserSettings from "./pages/UserSettings";
 import NotFound from "./pages/NotFound";
 import Exhibitions from "./pages/Exhibitions";
 import ExhibitionDetail from "./pages/ExhibitionDetail";
@@ -59,6 +60,7 @@ const App = () => (
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/dashboard" element={<ProtectedRoute element={<Admin />} requiredRole="admin" />} />
                   <Route path="/profile" element={<ProtectedRoute element={<Profile />} requiredRole="user" />} />
+                  <Route path="/settings" element={<ProtectedRoute element={<UserSettings />} requiredRole="user" />} />
                   <Route path="/warranty" element={<Warranty />} />
                   <Route path="/quality" element={<Quality />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
