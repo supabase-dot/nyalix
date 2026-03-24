@@ -10,6 +10,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import CategorySidebar from '@/components/CategorySidebar';
 import StarRating from '@/components/StarRating';
 import QuoteRequestModal from '@/components/QuoteRequestModal';
+import ProductImageModal from '@/components/ProductImageModal';
 
 interface Review {
   id: string;
@@ -33,6 +34,7 @@ const ProductDetail = () => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showQuoteModal, setShowQuoteModal] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const navigate = useNavigate();
 
@@ -171,15 +173,15 @@ const ProductDetail = () => {
           <main className="flex-1 min-w-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-            <div className="rounded-xl overflow-hidden border border-border shadow-luxury mb-3">
-              <img src={product.images?.[selectedImage] || '/placeholder.svg'} alt={name} className="w-full aspect-square object-cover" />
+            <div className="rounded-xl overflow-hidden border border-border shadow-luxury mb-3 cursor-pointer" onClick={() => setShowImageModal(true)}>
+              <img src={product.images?.[selectedImage] || '/placeholder.svg'} alt={name} className="w-full aspect-square object-contain hover:scale-105 transition-transform duration-300" />
             </div>
             {product.images && product.images.length > 1 &&
                 <div className="flex gap-2">
                 {product.images.map((img, i) =>
-                  <button key={i} onClick={() => setSelectedImage(i)}
-                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === i ? 'border-accent' : 'border-border'}`}>
-                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  <button key={i} onClick={() => { setSelectedImage(i); setShowImageModal(true); }}
+                  className={`w-16 h-16 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${selectedImage === i ? 'border-accent' : 'border-border'}`}>
+                    <img src={img} alt="" className="w-full h-full object-contain" />
                   </button>
                   )}
               </div>
@@ -226,6 +228,15 @@ const ProductDetail = () => {
               isOpen={showQuoteModal}
               onClose={() => setShowQuoteModal(false)}
               productId={product.id}
+              productName={name}
+            />
+
+            <ProductImageModal
+              isOpen={showImageModal}
+              onClose={() => setShowImageModal(false)}
+              images={product.images || []}
+              currentIndex={selectedImage}
+              onIndexChange={setSelectedImage}
               productName={name}
             />
             <div className="mt-10">
