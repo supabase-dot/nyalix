@@ -81,17 +81,19 @@ const ProductsDropdown = ({ isActive }: ProductsDropdownProps) => {
       <div className={`px-5 py-3 text-sm font-semibold transition-colors border-r border-white/10 flex items-center gap-1.5 ${
         isActive
           ? 'bg-primary text-white'
-          : 'text-white/85 hover:bg-white/10 hover:text-white'
-      }`}>
-        <Link to="/products" className="flex items-center">
+          : 'text-white/85 hover:bg-white/10 hover:text-white active:bg-white/20'
+      } ${isMobile ? 'min-h-12' : ''}`}>
+        <Link to="/products" className="flex items-center flex-1">
           {t('nav.products')}
         </Link>
         <button
           onClick={handleClick}
-          className="flex items-center"
+          className={`flex items-center p-1 rounded transition-colors ${isMobile ? 'touch-manipulation active:bg-white/10' : 'hover:bg-white/10'}`}
+          aria-label="Toggle products dropdown"
+          aria-expanded={isOpen}
         >
           <ChevronDown
-            className={`w-3.5 h-3.5 transition-transform duration-300 ${
+            className={`w-4 h-4 transition-transform duration-300 ${
               isOpen ? 'rotate-180' : ''
             }`}
           />
@@ -101,26 +103,27 @@ const ProductsDropdown = ({ isActive }: ProductsDropdownProps) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -8, scaleY: 0.95 }}
+            animate={{ opacity: 1, y: 0, scaleY: 1 }}
+            exit={{ opacity: 0, y: -8, scaleY: 0.95 }}
             transition={{ duration: 0.2 }}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={`absolute ${
               isRTL ? 'right-0' : 'left-0'
-            } top-full mt-0 w-48 bg-white rounded-md shadow-lg border border-border z-40 overflow-hidden`}
+            } top-full mt-1 ${isMobile ? 'w-full sm:w-56' : 'w-48'} bg-card rounded-md shadow-lg border border-border z-50 overflow-y-auto max-h-96`}
+            style={{ originY: 0 }}
           >
             {isLoading ? (
               <div className="px-4 py-3 text-sm text-muted-foreground text-center">
-                Loading categories...
+                {t('common.loading') || 'Loading categories...'}
               </div>
             ) : categories.length === 0 ? (
               <div className="px-4 py-3 text-sm text-muted-foreground text-center">
                 No categories available
               </div>
             ) : (
-              <div className="py-1">
+              <div className="py-2">
                 {categories.map((category, index) => {
                   const displayName = language === 'ar' ? category.name_ar : category.name;
                   const isLast = index === categories.length - 1;
@@ -132,11 +135,11 @@ const ProductsDropdown = ({ isActive }: ProductsDropdownProps) => {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.03, duration: 0.15 }}
                       onClick={() => handleCategoryClick(category.name)}
-                      className={`w-full px-4 py-2.5 text-sm text-left text-foreground hover:bg-primary hover:text-white transition-colors ${
-                        !isLast ? 'border-b border-border/30' : ''
-                      }`}
+                      className={`w-full px-4 py-3 text-sm text-left text-foreground hover:bg-primary hover:text-white active:bg-primary/90 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+                        !isLast ? 'border-b border-border/20' : ''
+                      } ${isMobile ? 'touch-manipulation' : ''}`}
                     >
-                      {displayName}
+                      <span className="block truncate">{displayName}</span>
                     </motion.button>
                   );
                 })}
