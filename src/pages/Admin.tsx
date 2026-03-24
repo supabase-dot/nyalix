@@ -32,7 +32,7 @@ class AdminErrorBoundary extends React.Component<{ children: React.ReactNode }, 
   render() {
     if (this.state.error) {
       return (
-        <div className="pt-20 min-h-screen bg-background flex items-center justify-center">
+        <div className="pt-28 lg:pt-24 min-h-screen bg-background flex items-center justify-center">
           <div className="bg-card rounded-xl border border-border p-8 shadow-luxury max-w-lg">
             <h1 className="text-xl font-bold text-foreground mb-4">Something went wrong</h1>
             <p className="text-sm text-muted-foreground mb-4">The admin dashboard failed to render.</p>
@@ -473,7 +473,7 @@ const Admin = () => {
   };
 
   if (loading) return (
-    <div className="pt-20 min-h-screen bg-background flex items-center justify-center">
+    <div className="pt-28 lg:pt-24 min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
         <p className="text-muted-foreground">Loading admin dashboard...</p>
@@ -539,31 +539,32 @@ const Admin = () => {
       />
 
       <div className="min-h-screen bg-background">
-        {/* Top navbar */}
-        <div className="bg-gradient-navy fixed top-0 left-0 right-0 z-40 py-4 border-b border-border">
-          <div className="flex items-center justify-between px-4 lg:px-8">
-            <div className="flex items-center gap-4">
+        {/* Top navbar — Admin Dashboard Header */}
+        <div className="bg-gradient-navy fixed top-0 left-0 right-0 z-50 py-3 md:py-4 border-b border-border/50">
+          <div className="flex items-center justify-between px-4 lg:px-8 h-14 md:h-16">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+                className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors shrink-0"
+                aria-label="Toggle sidebar"
               >
-                <Menu className="w-6 h-6 text-primary-foreground" />
+                <Menu className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </button>
-              <h1 className="text-2xl font-display font-bold text-primary-foreground">Admin Dashboard</h1>
+              <h1 className="text-xl md:text-2xl font-display font-bold text-primary-foreground truncate">Admin Dashboard</h1>
             </div>
-            {/* include newsletter in the global notification summary as well */}
+            {/* Include newsletter in the global notification summary as well */}
             {notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes > 0 &&
-            <div className="flex items-center gap-2 bg-gold/20 border border-gold/30 rounded-full px-4 py-1.5">
-                <Bell className="w-4 h-4 text-gold" />
-                <span className="text-gold text-sm font-medium">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes} new notifications</span>
+            <div className="flex items-center gap-2 bg-gold/20 border border-gold/30 rounded-full px-3 md:px-4 py-1.5 ml-2 shrink-0">
+                <Bell className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold shrink-0" />
+                <span className="text-gold text-xs md:text-sm font-medium hidden sm:inline">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes}</span>
               </div>
             }
           </div>
         </div>
 
-        {/* Main content area */}
-        <main className="pt-24 lg:ml-64 transition-all duration-300">
-          <div className="container mx-auto px-4 py-6">
+        {/* Main content area — Properly spaced below fixed navbar */}
+        <main className="pt-14 md:pt-16 lg:ml-64 transition-all duration-300">
+          <div className="container mx-auto px-4 py-6 max-w-7xl">
 
         {/* Dashboard */}
         {tab === 'dashboard' &&

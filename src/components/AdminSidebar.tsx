@@ -173,13 +173,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            className="fixed inset-0 z-30 bg-black/50 lg:hidden\"
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar Desktop (Always Visible) */}
-      <aside className="hidden lg:fixed lg:left-0 lg:top-0 lg:z-10 lg:h-screen lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-r lg:border-border lg:shadow-luxury lg:pt-24 lg:overflow-y-auto lg:flex lg:flex-col">
+      <aside className="hidden lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:h-screen lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-r lg:border-border lg:shadow-luxury lg:pt-16 lg:overflow-y-auto lg:flex lg:flex-col">
         <SidebarContent 
           sidebarItems={sidebarItems}
           activeTab={activeTab}
@@ -195,7 +195,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           x: isOpen ? 0 : -280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-0 z-50 h-screen w-64 bg-gradient-to-b from-card to-card/95 border-r border-border shadow-luxury pt-24 overflow-y-auto flex flex-col lg:hidden"
+        className="fixed left-0 top-0 z-40 h-screen w-64 bg-gradient-to-b from-card to-card/95 border-r border-border shadow-luxury pt-16 overflow-y-auto flex flex-col lg:hidden"
       >
         <SidebarContent 
           sidebarItems={sidebarItems}
