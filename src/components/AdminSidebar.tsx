@@ -20,6 +20,7 @@ interface AdminSidebarProps {
     messages: number;
     users: number;
     newsletter: number;
+    quotes: number;
   };
   isOpen?: boolean;
   onClose?: () => void;
@@ -157,7 +158,9 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             ? notifications.users
             : item.key === 'newsletter'
               ? notifications.newsletter
-              : undefined,
+              : item.key === 'quotes'
+                ? notifications.quotes
+                : undefined,
   }));
 
   return (

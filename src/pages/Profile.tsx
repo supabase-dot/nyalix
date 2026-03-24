@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, Pencil, Save, X, Star } from 'lucide-react';
+import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, Pencil, Save, X, Star, MessageSquare, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import StarRating from '@/components/StarRating';
 
@@ -38,12 +38,34 @@ interface Review {
   review_text: string;
 }
 
+interface QuoteRequest {
+  id: string;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  country: string;
+  product_name: string;
+  quantity: number;
+  message: string;
+  status: 'Pending' | 'Responded' | 'Approved';
+  admin_response: string | null;
+  admin_responded_at: string | null;
+  created_at: string;
+}
+
 const statusConfig: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
   pending: { icon: Clock, color: 'text-yellow-600', bg: 'bg-yellow-100' },
   processing: { icon: Package, color: 'text-blue-600', bg: 'bg-blue-100' },
   shipped: { icon: Truck, color: 'text-purple-600', bg: 'bg-purple-100' },
   delivered: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
   cancelled: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100' }
+};
+
+const quoteStatusConfig: Record<string, { icon: LucideIcon; color: string; bg: string; label: string }> = {
+  Pending: { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-100', label: 'Pending Review' },
+  Responded: { icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-100', label: 'Response Received' },
+  Approved: { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100', label: 'Approved' }
 };
 
 /* ── Review Modal ── */
@@ -157,6 +179,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState('');
@@ -184,10 +207,18 @@ const Profile = () => {
     const { data } = await supabase.from('product_reviews').select('*').eq('user_id', user.id);
     setReviews(data as unknown as Review[] ?? []);
   }, [user]);
-
+  const fetchQuotes = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('quote_requests')
+      .select('*')
+      .eq('email', user.email)
+      .order('created_at', { ascending: false });
+    setQuotes(data as QuoteRequest[] ?? []);
+  }, [user]);
   useEffect(() => {
-    if (user) {fetchOrders();fetchReviews();}
-  }, [user, fetchOrders, fetchReviews]);
+    if (user) {fetchOrders();fetchReviews();fetchQuotes();}
+  }, [user, fetchOrders, fetchReviews, fetchQuotes]);
 
   useEffect(() => {
     if (profile) {
@@ -459,6 +490,93 @@ const Profile = () => {
                     }
                       </div>
                   }
+                  </motion.div>);
+
+            })}
+            </div>
+          }
+        </div>
+
+        {/* Quote Requests */}
+        <div>
+          <h2 className="text-lg font-display font-semibold text-foreground mb-4">My Quote Requests</h2>
+          {quotes.length === 0 ?
+          <div className="bg-card rounded-xl border border-border p-8 text-center shadow-luxury">
+              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">You haven't submitted any quote requests yet.</p>
+            </div> :
+
+          <div className="space-y-4">
+              {quotes.map((quote, i) => {
+              const config = quoteStatusConfig[quote.status] || quoteStatusConfig.Pending;
+              const StatusIcon = config.icon;
+
+              return (
+                <motion.div key={quote.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="bg-card rounded-xl border border-border shadow-luxury overflow-hidden">
+                    <div className="p-5">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg ${config.bg} flex items-center justify-center`}>
+                            <StatusIcon className={`w-5 h-5 ${config.color}`} />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-foreground text-lg">{quote.product_name}</h3>
+                            <p className="text-sm text-muted-foreground">{config.label}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">Qty: {quote.quantity}</p>
+                          <p className="text-xs text-muted-foreground">{new Date(quote.created_at).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Admin Response */}
+                      {quote.admin_response && (
+                        <div className="bg-muted/50 rounded-lg border border-border p-4 mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MessageSquare className="w-4 h-4 text-primary" />
+                            <span className="text-sm font-medium text-foreground">Admin Response</span>
+                            {quote.admin_responded_at && (
+                              <span className="text-xs text-muted-foreground">
+                                {new Date(quote.admin_responded_at).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-foreground leading-relaxed">{quote.admin_response}</p>
+                        </div>
+                      )}
+
+                      {/* Quote Details */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Company</p>
+                          <p className="font-medium text-foreground">{quote.company}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Contact</p>
+                          <p className="font-medium text-foreground">{quote.phone}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Country</p>
+                          <p className="font-medium text-foreground">{quote.country}</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Status</p>
+                          <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium ${config.bg} ${config.color} border`}>
+                            <StatusIcon className="w-3 h-3" />
+                            {quote.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {quote.message && (
+                        <div className="mt-4 pt-4 border-t border-border">
+                          <p className="text-sm text-muted-foreground mb-2">Your Message</p>
+                          <p className="text-sm text-foreground leading-relaxed">{quote.message}</p>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>);
 
             })}

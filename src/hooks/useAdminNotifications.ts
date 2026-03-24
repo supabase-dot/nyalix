@@ -6,6 +6,7 @@ export interface NotificationCounts {
   messages: number;
   users: number;
   newsletter: number;
+  quotes: number;
 }
 
 export const useAdminNotifications = () => {
@@ -14,6 +15,7 @@ export const useAdminNotifications = () => {
     messages: 0,
     users: 0,
     newsletter: 0,
+    quotes: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -92,6 +94,11 @@ export const useAdminNotifications = () => {
         .select('*', { count: 'exact', head: true })
         .eq('read', false);
 
+      const { count: unreadQuoteCount, error: quoteErr } = await supabase
+        .from('quote_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('read', false);
+
       const { count: unnNotifiedUserCount, error: userErr } = await supabase
         .from('profiles')
         .select('*', { count: 'exact', head: true })
@@ -109,6 +116,7 @@ export const useAdminNotifications = () => {
         messages: unreadMsgCount || 0,
         users: unnNotifiedUserCount || 0,
         newsletter: unreadNewslCount || 0,
+        quotes: unreadQuoteCount || 0,
       };
 
       console.log('fetchCounts: Final counts:', finalCounts);
@@ -117,6 +125,7 @@ export const useAdminNotifications = () => {
       if (ordersErr) console.error('Error fetching orders:', ordersErr);
       if (messErr) console.error('Error fetching messages:', messErr);
       if (newslErr) console.error('Error fetching newsletter:', newslErr);
+      if (quoteErr) console.error('Error fetching quotes:', quoteErr);
       if (userErr) console.error('Error fetching users:', userErr);
     } catch (error) {
       console.error('Error fetching notification counts:', error);
@@ -191,6 +200,29 @@ export const useAdminNotifications = () => {
       setCounts((prev) => ({ ...prev, newsletter: unreadCount || 0 }));
     } catch (error) {
       console.error('Error marking newsletter as read:', error);
+    }
+  }, []);
+
+  // Mark quote requests as read
+  const markQuotesAsRead = useCallback(async () => {
+    try {
+      const { error } = await supabase
+        .from('quote_requests')
+        .update({ read: true })
+        .eq('read', false);
+
+      if (error) throw error;
+
+      // Refetch to ensure state is synced with database
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const { count: unreadCount } = await supabase
+        .from('quote_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('read', false);
+
+      setCounts((prev) => ({ ...prev, quotes: unreadCount || 0 }));
+    } catch (error) {
+      console.error('Error marking quotes as read:', error);
     }
   }, []);
 
@@ -357,6 +389,48 @@ export const useAdminNotifications = () => {
         }
       });
 
+    // Subscribe to new quote requests
+    const quotesChannel = supabase
+      .channel('admin-quotes-unread')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'quote_requests',
+        },
+        () => {
+          // Increment quotes count
+          setCounts((prev) => ({
+            ...prev,
+            quotes: prev.quotes + 1,
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'quote_requests',
+          filter: 'read=eq.true',
+        },
+        () => {
+          // Decrement when marked as read externally
+          setCounts((prev) => ({
+            ...prev,
+            quotes: Math.max(0, prev.quotes - 1),
+          }));
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('useAdminNotifications: Successfully subscribed to quotes');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.warn('useAdminNotifications: Failed to subscribe to quotes realtime');
+        }
+      });
+
     // Subscribe to new profiles (users)
     const usersChannel = supabase
       .channel('admin-users-unread')
@@ -404,6 +478,7 @@ export const useAdminNotifications = () => {
       supabase.removeChannel(ordersChannel);
       supabase.removeChannel(messagesChannel);
       supabase.removeChannel(newsletterChannel);
+      supabase.removeChannel(quotesChannel);
       supabase.removeChannel(usersChannel);
     };
   }, [fetchCounts]);
@@ -415,6 +490,7 @@ export const useAdminNotifications = () => {
     markOrdersAsRead,
     markMessagesAsRead,
     markNewsletterAsRead,
+    markQuotesAsRead,
     markUsersAsNotified,
   };
 };

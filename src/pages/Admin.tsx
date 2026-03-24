@@ -126,7 +126,7 @@ const Admin = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [products, setProducts] = useState<Product[]>([]);
   const { categories, isLoading: categoriesLoading, error: categoriesError } = useCategoriesRealtime();
-  const { counts: notificationCounts, markOrdersAsRead, markMessagesAsRead, markNewsletterAsRead, markUsersAsNotified } = useAdminNotifications();
+  const { counts: notificationCounts, markOrdersAsRead, markMessagesAsRead, markNewsletterAsRead, markQuotesAsRead, markUsersAsNotified } = useAdminNotifications();
 
   useEffect(() => {
     if (categoriesError) {
@@ -501,6 +501,8 @@ const Admin = () => {
       markUsersAsNotified();
     } else if (t === 'newsletter') {
       markNewsletterAsRead();
+    } else if (t === 'quotes') {
+      markQuotesAsRead();
     }
     
     setSidebarOpen(false); // Close sidebar on mobile after navigation
@@ -530,6 +532,7 @@ const Admin = () => {
           messages: notificationCounts.messages,
           users: notificationCounts.users,
           newsletter: notificationCounts.newsletter,
+          quotes: notificationCounts.quotes,
         }}
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -549,10 +552,10 @@ const Admin = () => {
               <h1 className="text-2xl font-display font-bold text-primary-foreground">Admin Dashboard</h1>
             </div>
             {/* include newsletter in the global notification summary as well */}
-            {notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter > 0 &&
+            {notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes > 0 &&
             <div className="flex items-center gap-2 bg-gold/20 border border-gold/30 rounded-full px-4 py-1.5">
                 <Bell className="w-4 h-4 text-gold" />
-                <span className="text-gold text-sm font-medium">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter} new notifications</span>
+                <span className="text-gold text-sm font-medium">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes} new notifications</span>
               </div>
             }
           </div>
@@ -1447,12 +1450,17 @@ const Admin = () => {
 
 };
 
-/* ─── Newsletter Tab ─── */
+/* ─── Enhanced Newsletter Tab ─── */
 const NewsletterTab = () => {
   const { markNewsletterAsRead } = useAdminNotifications();
-  const [subscribers, setSubscribers] = useState<{id: string;email: string;created_at: string;}[]>([]);
+  const [subscribers, setSubscribers] = useState<{id: string;email: string;created_at: string;read: boolean;}[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [readFilter, setReadFilter] = useState<'All' | 'Read' | 'Unread'>('All');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'email'>('newest');
+  const [currentPage, setCurrentPage] = useState(1);
   const [confirmModal, setConfirmModal] = useState<{open: boolean;id: string;email: string;} | null>(null);
+  const itemsPerPage = 10;
 
   // mark anything unread as read whenever the newsletter tab mounts
   useEffect(() => {
@@ -1474,8 +1482,58 @@ const NewsletterTab = () => {
     setConfirmModal(null);
   };
 
+  const markAsRead = async (id: string) => {
+    const { error } = await supabase
+      .from('newsletter_subscribers')
+      .update({ read: true })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error marking subscriber as read:', error);
+      return;
+    }
+
+    setSubscribers((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, read: true } : s))
+    );
+  };
+
+  // Filter and sort subscribers
+  const filteredSubscribers = subscribers
+    .filter((s) => {
+      const matchesSearch = s.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesReadFilter = readFilter === 'All' || 
+        (readFilter === 'Read' && s.read) || 
+        (readFilter === 'Unread' && !s.read);
+      return matchesSearch && matchesReadFilter;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'email':
+          return a.email.localeCompare(b.email);
+        case 'newest':
+        default:
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      }
+    });
+
+  // Pagination
+  const totalPages = Math.ceil(filteredSubscribers.length / itemsPerPage);
+  const paginatedSubscribers = filteredSubscribers.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const stats = {
+    total: subscribers.length,
+    read: subscribers.filter(s => s.read).length,
+    unread: subscribers.filter(s => !s.read).length,
+  };
+
   const exportCSV = () => {
-    const csv = ['Email,Subscribed At', ...subscribers.map((s) => `${s.email},${new Date(s.created_at).toLocaleDateString()}`)].join('\n');
+    const csv = ['Email,Subscribed At,Status', ...filteredSubscribers.map((s) => `${s.email},${new Date(s.created_at).toLocaleDateString()},${s.read ? 'Read' : 'Unread'}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1487,7 +1545,210 @@ const NewsletterTab = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
+            <Mail className="w-6 h-6 text-primary" />
+            Newsletter Subscribers
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage your newsletter subscribers
+          </p>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {[
+          { label: 'Total Subscribers', value: stats.total, icon: Mail, color: 'primary' },
+          { label: 'Read', value: stats.read, icon: Eye, color: 'green' },
+          { label: 'Unread', value: stats.unread, icon: EyeOff, color: 'amber' },
+        ].map((stat, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="bg-card rounded-xl border border-border p-4 shadow-luxury"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-lg bg-${stat.color}/10 flex items-center justify-center`}>
+                <stat.icon className={`w-5 h-5 text-${stat.color}`} />
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Filters and Search */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3">
+          {/* Read Filter */}
+          <div className="flex gap-2">
+            {(['All', 'Read', 'Unread'] as const).map((filter) => (
+              <button
+                key={filter}
+                onClick={() => {
+                  setReadFilter(filter);
+                  setCurrentPage(1);
+                }}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
+                  readFilter === filter
+                    ? 'bg-gradient-gold text-white'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="email">Email A-Z</option>
+          </select>
+        </div>
+
+        <div className="flex gap-3">
+          {/* Search */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search subscribers..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring w-64"
+            />
+            <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          {/* Export */}
+          <button onClick={exportCSV} disabled={filteredSubscribers.length === 0}
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
+            <Download className="w-4 h-4" /> Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Subscribers List */}
+      {loading && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Loading subscribers...</p>
+        </div>
+      )}
+
+      {!loading && paginatedSubscribers.length === 0 && (
+        <div className="text-center py-12 bg-card rounded-xl border border-border">
+          <Mail className="w-12 h-12 text-muted-foreground mx-auto opacity-50 mb-3" />
+          <p className="text-muted-foreground">No subscribers found</p>
+        </div>
+      )}
+
+      <div className="space-y-4">
+        <AnimatePresence>
+          {paginatedSubscribers.map((subscriber) => (
+            <motion.div
+              key={subscriber.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className={`bg-card rounded-xl border ${
+                !subscriber.read
+                  ? 'border-primary/50 bg-primary/5'
+                  : 'border-border'
+              } p-4 shadow-luxury transition-all`}
+            >
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  {!subscriber.read && (
+                    <button
+                      onClick={() => markAsRead(subscriber.id)}
+                      className="p-1.5 hover:bg-muted rounded-lg transition-colors flex-shrink-0"
+                      title="Mark as read"
+                    >
+                      <EyeOff className="w-4 h-4 text-primary" />
+                    </button>
+                  )}
+                  {subscriber.read && (
+                    <div className="p-1.5 flex-shrink-0">
+                      <Eye className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  )}
+
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4 text-primary" />
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground truncate">{subscriber.email}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-muted-foreground">
+                        Subscribed: {new Date(subscriber.created_at).toLocaleDateString()}
+                      </span>
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
+                        subscriber.read
+                          ? 'bg-green-500/10 text-green-700 border border-green-200'
+                          : 'bg-amber-500/10 text-amber-700 border border-amber-200'
+                      }`}>
+                        {subscriber.read ? 'Read' : 'Unread'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => setConfirmModal({ open: true, id: subscriber.id, email: subscriber.email })}
+                  className="p-2 text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-lg transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-2 mt-6">
+          <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Previous
+          </button>
+
+          <span className="text-sm text-muted-foreground">
+            Page {currentPage} of {totalPages} ({filteredSubscribers.length} subscribers)
+          </span>
+
+          <button
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Next
+          </button>
+        </div>
+      )}
+
+      {/* Confirm Modal */}
       <AnimatePresence>
         {confirmModal?.open &&
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setConfirmModal(null)}>
@@ -1509,35 +1770,6 @@ const NewsletterTab = () => {
           </div>
         }
       </AnimatePresence>
-
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-lg font-display font-semibold text-foreground">Newsletter Subscribers ({subscribers.length})</h2>
-        <button onClick={exportCSV} disabled={subscribers.length === 0}
-        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
-          <Download className="w-4 h-4" /> Export CSV
-        </button>
-      </div>
-
-      {loading && <p className="text-muted-foreground text-sm">Loading...</p>}
-      {!loading && subscribers.length === 0 && <p className="text-muted-foreground">No subscribers yet.</p>}
-
-      <div className="grid gap-3">
-        {subscribers.map((s) =>
-        <div key={s.id} className="flex items-center gap-4 bg-card rounded-xl border border-border p-4 shadow-luxury">
-            <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-              <Mail className="w-4 h-4 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-medium text-foreground truncate">{s.email}</p>
-              <p className="text-xs text-muted-foreground">Subscribed: {new Date(s.created_at).toLocaleDateString()}</p>
-            </div>
-            <button onClick={() => setConfirmModal({ open: true, id: s.id, email: s.email })}
-          className="p-2 text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-lg transition-colors">
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        )}
-      </div>
     </div>);
 
 };
