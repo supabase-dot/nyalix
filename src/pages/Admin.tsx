@@ -563,8 +563,8 @@ const Admin = () => {
         </div>
 
         {/* Main content area — Properly spaced below fixed navbar */}
-        <main className="pt-20 md:pt-24 lg:ml-64 transition-all duration-300 min-h-screen bg-background">
-          <div className="container mx-auto px-4 py-8 md:py-12 max-w-7xl">
+        <main className="pt-14 md:pt-16 lg:ml-64 transition-all duration-300">
+          <div className="container mx-auto px-4 py-6 max-w-7xl">
 
         {/* Dashboard */}
         {tab === 'dashboard' &&

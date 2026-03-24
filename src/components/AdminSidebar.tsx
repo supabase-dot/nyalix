@@ -91,18 +91,8 @@ const SidebarContent: React.FC<{
             )}
 
             <div className="flex items-center gap-3 flex-1 min-w-0">
-              <Icon className={cn(
-                'w-5 h-5 shrink-0 transition-all',
-                isActive
-                  ? 'text-primary-foreground'
-                  : 'text-muted-foreground group-hover:text-foreground group-active:text-foreground'
-              )} />
-              <span className={cn(
-                'font-medium truncate text-sm transition-colors',
-                isActive ? 'text-current' : ''
-              )}>
-                {item.label}
-              </span>
+              <Icon className={cn('w-5 h-5 shrink-0 transition-all', isActive ? 'text-current' : 'group-hover:scale-110')} />
+              <span className="font-medium truncate text-sm">{item.label}</span>
             </div>
 
             {/* Badge for notifications */}
@@ -190,7 +180,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </AnimatePresence>
 
       {/* Sidebar Desktop (Always Visible) */}
-      <aside className="hidden lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:h-screen lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-r lg:border-border lg:shadow-luxury lg:pt-16 lg:overflow-y-auto lg:flex lg:flex-col">
+      <aside className="hidden lg:fixed lg:left-0 lg:top-16 lg:z-30 lg:h-[calc(100vh-64px)] lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-r lg:border-border lg:shadow-luxury lg:pt-16 lg:overflow-y-auto lg:flex lg:flex-col">
         <SidebarContent 
           sidebarItems={sidebarItems}
           activeTab={activeTab}
@@ -206,7 +196,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
           x: isOpen ? 0 : -280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-0 z-40 h-screen w-64 bg-gradient-to-b from-card to-card/95 border-r border-border shadow-luxury pt-14 md:pt-16 overflow-y-auto flex flex-col lg:hidden"
+        className="fixed left-0 top-14 md:top-16 z-40 h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] w-64 bg-gradient-to-b from-card to-card/95 border-r border-border shadow-luxury pt-14 md:pt-16 overflow-y-auto flex flex-col lg:hidden"
       >
         <SidebarContent 
           sidebarItems={sidebarItems}
