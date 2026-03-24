@@ -50,7 +50,7 @@ const TopBar = () => {
             <span className="text-sm text-gray-600 hidden md:inline">{t('contact.followUs')}</span>
             <div className="flex items-center gap-2">
               <a
-                href="https://www.facebook.com/nyalixmedical"
+                href="https://www.facebook.com/share/1AX9YpPXPe/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
@@ -68,7 +68,7 @@ const TopBar = () => {
                 <YoutubeIcon />
               </a>
               <a
-                href="https://www.tiktok.com/@nyalixmedical"
+                href="https://www.tiktok.com/@nyalixmed?_r=1&_t=ZG-94xg86PEtWb"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
