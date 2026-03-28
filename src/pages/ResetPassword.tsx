@@ -3,12 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock } from 'lucide-react';
 import { toast } from 'sonner';
+import { validatePassword } from '@/lib/validation';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    const result = validatePassword(value);
+    setError(result.isValid ? '' : result.message || '');
+  };
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -20,6 +26,14 @@ const ResetPassword = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setError(passwordValidation.message || '');
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
     if (error) { toast.error(error.message); return; }
@@ -45,14 +59,14 @@ const ResetPassword = () => {
             <input
               type="password"
               required
-              minLength={6}
               placeholder="New Password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              onChange={e => handlePasswordChange(e.target.value)}
+              className={`w-full pl-10 pr-4 py-3 rounded-lg border ${error ? 'border-red-500' : 'border-border'} bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring`}
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
-          <button type="submit" disabled={loading} className="w-full px-6 py-3.5 bg-gradient-gold rounded-lg font-semibold text-primary hover:opacity-90 transition-all shadow-gold disabled:opacity-50">
+          <button type="submit" disabled={loading} className="w-full px-6 py-3.5 bg-gradient-gold rounded-lg font-semibold text-primary-foreground hover:opacity-90 transition-all shadow-gold disabled:opacity-50">
             {loading ? '...' : 'Update Password'}
           </button>
         </form>

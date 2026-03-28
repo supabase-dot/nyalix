@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { X, Send, Building2, Mail, Phone, Globe, Package, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { validatePhone } from '@/lib/validation';
 
 interface QuoteRequestModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ phone: '' });
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -44,6 +46,11 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       ...prev,
       [name]: name === 'quantity' ? Math.max(1, parseInt(value) || 1) : value,
     }));
+
+    if (name === 'phone') {
+      const result = validatePhone(value);
+      setErrors(prev => ({ ...prev, phone: result.isValid ? '' : result.message || '' }));
+    }
   };
 
   const isValidEmail = (email: string) => {
@@ -65,6 +72,13 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
       formData.quantity < 1
     ) {
       toast.error(t('quote.validationError'));
+      return;
+    }
+
+    // Phone validation
+    const phoneValidation = validatePhone(formData.phone);
+    if (!phoneValidation.isValid) {
+      setErrors(prev => ({ ...prev, phone: phoneValidation.message || '' }));
       return;
     }
 
@@ -216,9 +230,10 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
                     onChange={handleChange}
                     placeholder={t('quote.phonePlaceholder')}
                     dir="ltr"
-                    className={`w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors`}
+                    className={`w-full px-4 py-2.5 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-border'} bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-colors`}
                     disabled={loading}
                   />
+                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                 </div>
 
                 {/* Country */}

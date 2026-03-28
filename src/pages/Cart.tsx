@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, Trash2, ShoppingBag, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateAndSendNotifications } from '@/lib/notifications';
+import { validatePhone } from '@/lib/validation';
 
 const Cart = () => {
   const { t } = useTranslation();
@@ -19,6 +20,23 @@ const Cart = () => {
   const [step, setStep] = useState<'cart' | 'checkout' | 'success'>('cart');
   const [orderId, setOrderId] = useState('');
   const [placing, setPlacing] = useState(false);
+  const [checkoutForm, setCheckoutForm] = useState({
+    fullName: '',
+    email: '',
+    phone: '',
+    country: '',
+    city: '',
+    address: ''
+  });
+  const [errors, setErrors] = useState({ phone: '' });
+
+  const handleInputChange = (field: string, value: string) => {
+    setCheckoutForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'phone') {
+      const result = validatePhone(value);
+      setErrors(prev => ({ ...prev, phone: result.isValid ? '' : result.message || '' }));
+    }
+  };
 
   const handleCheckout = () => {
     if (!user) {
@@ -33,17 +51,24 @@ const Cart = () => {
     e.preventDefault();
     if (!user) return;
     setPlacing(true);
-    const formData = new FormData(e.target as HTMLFormElement);
+
+    // Validate phone
+    const phoneValidation = validatePhone(checkoutForm.phone);
+    if (!phoneValidation.isValid) {
+      setErrors({ phone: phoneValidation.message || '' });
+      setPlacing(false);
+      return;
+    }
 
     const basePayload: Record<string, string | number> = {
       user_id: user.id,
       total: totalPrice,
-      shipping_name: formData.get('fullName') as string,
-      shipping_address: formData.get('address') as string,
-      shipping_city: formData.get('city') as string,
-      shipping_country: formData.get('country') as string,
-      shipping_phone: formData.get('phone') as string,
-      shipping_email: formData.get('email') as string
+      shipping_name: checkoutForm.fullName,
+      shipping_address: checkoutForm.address,
+      shipping_city: checkoutForm.city,
+      shipping_country: checkoutForm.country,
+      shipping_phone: checkoutForm.phone,
+      shipping_email: checkoutForm.email
     };
 
     // attempt to insert; if column is missing in schema we retry without it
@@ -183,19 +208,31 @@ const Cart = () => {
         <div className="max-w-2xl mx-auto">
             <form onSubmit={handlePlaceOrder} className="space-y-6">
               <div className="bg-card rounded-xl border border-border p-6 shadow-luxury space-y-4">
-                {[
-              { name: 'fullName', label: t('cart.fullName'), type: 'text' },
-              { name: 'email', label: t('cart.email'), type: 'email' },
-              { name: 'phone', label: t('cart.phone'), type: 'tel' },
-              { name: 'country', label: t('cart.country'), type: 'text' },
-              { name: 'city', label: t('cart.city'), type: 'text' },
-              { name: 'address', label: t('cart.address'), type: 'text' }].
-              map((field) =>
-              <div key={field.name}>
-                    <label className="block text-sm font-medium text-foreground mb-1">{field.label}</label>
-                    <input name={field.name} type={field.type} required className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
-                  </div>
-              )}
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.fullName')}</label>
+                  <input name="fullName" type="text" required value={checkoutForm.fullName} onChange={(e) => handleInputChange('fullName', e.target.value)} className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.email')}</label>
+                  <input name="email" type="email" required value={checkoutForm.email} onChange={(e) => handleInputChange('email', e.target.value)} className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.phone')}</label>
+                  <input name="phone" type="tel" required value={checkoutForm.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className={`w-full px-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-border'} bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50`} />
+                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.country')}</label>
+                  <input name="country" type="text" required value={checkoutForm.country} onChange={(e) => handleInputChange('country', e.target.value)} className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.city')}</label>
+                  <input name="city" type="text" required value={checkoutForm.city} onChange={(e) => handleInputChange('city', e.target.value)} className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('cart.address')}</label>
+                  <input name="address" type="text" required value={checkoutForm.address} onChange={(e) => handleInputChange('address', e.target.value)} className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-gold/50" />
+                </div>
               </div>
               <div className="bg-card rounded-xl border border-border p-6 shadow-luxury">
                 <h3 className="font-display font-semibold text-foreground mb-3">{t('cart.orderSummary')}</h3>

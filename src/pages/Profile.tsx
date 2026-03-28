@@ -161,7 +161,7 @@ const ReviewModal = ({
           <button
             type="submit"
             disabled={saving || rating === 0}
-            className="w-full px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-primary hover:opacity-90 transition-all shadow-gold disabled:opacity-50">
+            className="w-full px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-primary-foreground hover:opacity-90 transition-all shadow-gold disabled:opacity-50">
             
             {saving ? 'Submitting...' : existingReview ? 'Update Review' : 'Submit Review'}
           </button>

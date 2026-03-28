@@ -77,7 +77,7 @@ const TopBar = () => {
                 <TiktokIcon />
               </a>
               <a
-                href="https://www.instagram.com/nyalixmedical"
+                href="https://www.instagram.com/ismail_yagoub?igsh=cnZuNHM2NDAxYmhm"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"

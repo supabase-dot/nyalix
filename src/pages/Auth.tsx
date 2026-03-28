@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, User, Phone, Globe, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import { validatePhone, validatePassword } from '@/lib/validation';
 
 const Auth = () => {
   const { t } = useTranslation();
@@ -15,6 +16,29 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '', fullName: '', phone: '', country: '' });
+  const [errors, setErrors] = useState({ phone: '', password: '' });
+
+  // Clear errors when mode changes
+  useEffect(() => {
+    setErrors({ phone: '', password: '' });
+  }, [mode]);
+
+  const validateFormField = (field: string, value: string) => {
+    if (field === 'phone') {
+      const result = validatePhone(value);
+      setErrors(prev => ({ ...prev, phone: result.isValid ? '' : result.message || '' }));
+    } else if (field === 'password' && mode === 'signup') {
+      const result = validatePassword(value);
+      setErrors(prev => ({ ...prev, password: result.isValid ? '' : result.message || '' }));
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'phone' || (field === 'password' && mode === 'signup')) {
+      validateFormField(field, value);
+    }
+  };
 
   // Redirect based on role after authentication
   useEffect(() => {
@@ -43,6 +67,19 @@ const Auth = () => {
     }
 
     if (mode === 'signup') {
+      // Validate before submitting
+      const phoneValidation = validatePhone(form.phone);
+      const passwordValidation = validatePassword(form.password);
+
+      if (!phoneValidation.isValid || !passwordValidation.isValid) {
+        setErrors({
+          phone: phoneValidation.isValid ? '' : phoneValidation.message || '',
+          password: passwordValidation.isValid ? '' : passwordValidation.message || ''
+        });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await signUp(form.email, form.password, form.fullName, form.phone, form.country);
       setLoading(false);
       if (error) {toast.error(error.message);return;}
@@ -58,7 +95,7 @@ const Auth = () => {
     // Redirect will be handled by the useEffect above
   };
 
-  const inputClass = "w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring";
+  const inputClass = (field?: string) => `w-full pl-10 pr-4 py-3 rounded-lg border transition-all duration-200 ${field && errors[field as keyof typeof errors] ? 'border-red-500 focus:border-red-500' : 'border-border hover:border-ring focus:border-ring'} bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring/20 placeholder:text-muted-foreground`;
 
   return (
     <div className="pt-20 min-h-screen bg-background flex items-center justify-center">
@@ -67,61 +104,76 @@ const Auth = () => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md mx-4">
         
-        <div className="bg-card rounded-xl border border-border p-8 shadow-luxury">
+        <div className="bg-card rounded-xl border border-border p-8 shadow-luxury backdrop-blur-sm">
           <div className="text-center mb-8">
-            <div className="w-14 h-14 rounded-lg bg-gradient-gold flex items-center justify-center mx-auto mb-4">
+            <motion.div
+              className="w-14 h-14 rounded-lg bg-gradient-gold flex items-center justify-center mx-auto mb-4 shadow-gold"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
               <span className="font-display font-bold text-primary-foreground text-xl">N</span>
-            </div>
+            </motion.div>
             <h1 className="text-2xl font-display font-bold text-foreground">
               {mode === 'login' ? t('nav.login') : mode === 'signup' ? t('nav.signup') : 'Reset Password'}
             </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {mode === 'signup' &&
             <>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input type="text" required placeholder="Full Name" value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} className={inputClass} />
+                <div className="space-y-1">
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input type="text" required placeholder="Full Name" value={form.fullName} onChange={(e) => handleInputChange('fullName', e.target.value)} className={inputClass()} />
+                  </div>
                 </div>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input type="tel" required placeholder="Phone Number" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inputClass} />
+                <div className="space-y-1">
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input type="tel" required placeholder="Phone Number" value={form.phone} onChange={(e) => handleInputChange('phone', e.target.value)} className={inputClass('phone')} />
+                  </div>
+                  {errors.phone && <p className="text-red-500 text-sm mt-1 ml-1">{errors.phone}</p>}
                 </div>
-                <div className="relative">
-                  <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <input type="text" required placeholder="Country" value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className={inputClass} />
+                <div className="space-y-1">
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input type="text" required placeholder="Country" value={form.country} onChange={(e) => handleInputChange('country', e.target.value)} className={inputClass()} />
+                  </div>
                 </div>
               </>
             }
 
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input type="email" required placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className={inputClass} />
+            <div className="space-y-1">
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input type="email" required placeholder="Email" value={form.email} onChange={(e) => handleInputChange('email', e.target.value)} className={inputClass()} />
+              </div>
             </div>
 
             {mode !== 'forgot' &&
-            <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                type={showPassword ? 'text' : 'password'}
-                required
-                minLength={6}
-                placeholder="Password"
-                value={form.password}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className={inputClass} />
-              
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
+            <div className="space-y-1">
+              <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  className={`${inputClass('password')} pr-10`} />
+                
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200">
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                {mode === 'signup' && errors.password && <p className="text-red-500 text-sm mt-1 ml-1">{errors.password}</p>}
               </div>
             }
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3.5 bg-gradient-gold rounded-lg font-semibold hover:opacity-90 transition-all shadow-gold disabled:opacity-50 text-gray-50 bg-primary border border-primary shadow-none">
+              className="w-full px-6 py-3.5 bg-gradient-gold rounded-lg font-semibold text-primary-foreground hover:opacity-90 focus:opacity-90 transition-all duration-200 shadow-gold disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]">
               
               {loading ? '...' : mode === 'login' ? t('nav.login') : mode === 'signup' ? t('nav.signup') : 'Send Reset Link'}
             </button>

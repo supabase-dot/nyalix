@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { User, Mail, Phone, Globe, Lock, Eye, EyeOff, Home, ArrowLeft } from 'lucide-react';
+import { validatePhone, validatePassword } from '@/lib/validation';
 
 const UserSettings = () => {
   const { user, profile, loading: authLoading, updateProfile } = useAuth();
@@ -22,6 +23,28 @@ const UserSettings = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [saving, setSaving] = useState(false);
   const [emailChanged, setEmailChanged] = useState(false);
+  const [errors, setErrors] = useState({ phone: '', newPassword: '' });
+
+  const validateFormField = (field: string, value: string) => {
+    if (field === 'phone') {
+      const result = validatePhone(value);
+      setErrors(prev => ({ ...prev, phone: result.isValid ? '' : result.message || '' }));
+    } else if (field === 'newPassword') {
+      const result = validatePassword(value);
+      setErrors(prev => ({ ...prev, newPassword: result.isValid ? '' : result.message || '' }));
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    if (field === 'phone') setPhone(value);
+    else if (field === 'newPassword') setNewPassword(value);
+    else if (field === 'confirmPassword') setConfirmPassword(value);
+    else if (field === 'currentPassword') setCurrentPassword(value);
+
+    if (field === 'phone' || field === 'newPassword') {
+      validateFormField(field, value);
+    }
+  };
 
   // Initialize form fields from profile data
   useEffect(() => {
@@ -48,6 +71,14 @@ const UserSettings = () => {
       // Validation
       if (!fullName.trim()) {
         toast.error('Full name is required');
+        setSaving(false);
+        return;
+      }
+
+      // Validate phone
+      const phoneValidation = validatePhone(phone);
+      if (!phoneValidation.isValid) {
+        setErrors(prev => ({ ...prev, phone: phoneValidation.message || '' }));
         setSaving(false);
         return;
       }
@@ -81,8 +112,9 @@ const UserSettings = () => {
       // Update password if provided
       if (newPassword.trim()) {
         // Validate password
-        if (newPassword.length < 6) {
-          toast.error('Password must be at least 6 characters long');
+        const passwordValidation = validatePassword(newPassword);
+        if (!passwordValidation.isValid) {
+          setErrors(prev => ({ ...prev, newPassword: passwordValidation.message || '' }));
           setSaving(false);
           return;
         }
@@ -200,11 +232,12 @@ const UserSettings = () => {
                       <input
                         type="tel"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        onChange={(e) => handleInputChange('phone', e.target.value)}
+                        className={`w-full pl-10 pr-4 py-3 rounded-lg border ${errors.phone ? 'border-red-500' : 'border-border'} bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring`}
                         placeholder="+1 (555) 000-0000"
                       />
                     </div>
+                    {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
                   </div>
 
                   {/* Country */}
@@ -273,8 +306,8 @@ const UserSettings = () => {
                       <input
                         type={showNewPassword ? 'text' : 'password'}
                         value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full pl-10 pr-10 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                        onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                        className={`w-full pl-10 pr-10 py-3 rounded-lg border ${errors.newPassword ? 'border-red-500' : 'border-border'} bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring`}
                         placeholder="••••••••"
                       />
                       <button
@@ -285,11 +318,7 @@ const UserSettings = () => {
                         {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
-                    {newPassword && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {newPassword.length < 6 ? '❌ Password must be at least 6 characters' : '✓ Password is strong'}
-                      </p>
-                    )}
+                    {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
                   </div>
 
                   {/* Confirm Password */}

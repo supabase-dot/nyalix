@@ -72,7 +72,7 @@ const CertificatesSection = () => {
 
         <div className="text-center mt-10">
           <Link to="/certifications"
-            className="inline-block px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-primary hover:opacity-90 transition-all shadow-gold">
+            className="inline-block px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-primary-foreground hover:opacity-90 transition-all shadow-gold">
             {t('certifications.title')}
           </Link>
         </div>

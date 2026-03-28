@@ -429,7 +429,7 @@ const AdminQuotesTab = () => {
                               onClick={() =>
                                 saveResponse(quote.id, editingResponse.response)
                               }
-                              className="flex-1 px-4 py-2 bg-gradient-gold text-primary rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                              className="flex-1 px-4 py-2 bg-gradient-gold text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-all flex items-center justify-center gap-2"
                             >
                               <Send className="w-4 h-4" />
                               {t('quote.admin.saveResponse')}
