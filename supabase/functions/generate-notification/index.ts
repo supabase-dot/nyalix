@@ -235,7 +235,7 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
         <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
         <p>This is an automated welcome message. Please do not reply to this email.</p>
       </div>
     </body>
@@ -310,7 +310,7 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
         <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
         <p>This is an automated invoice. Please do not reply to this email.</p>
       </div>
     </body>
@@ -352,7 +352,7 @@ function generateStatusUpdateEmail(profile: ProfileRecord, order: OrderRecord): 
         <p>If you have any questions, please contact our support team at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
         <p>This is an automated message. Please do not reply to this email.</p>
       </div>
     </body>

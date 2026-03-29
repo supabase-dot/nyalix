@@ -557,9 +557,9 @@ const Admin = () => {
             </div>
             {/* Include newsletter in the global notification summary as well */}
             {notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes > 0 &&
-            <div className="flex items-center gap-2 bg-gold/20 border border-gold/30 rounded-full px-3 md:px-4 py-1.5 ml-2 shrink-0">
-                <Bell className="w-3.5 h-3.5 md:w-4 md:h-4 text-gold shrink-0" />
-                <span className="text-gold text-xs md:text-sm font-medium hidden sm:inline">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes}</span>
+            <div className="flex items-center gap-2 bg-gradient-to-r from-gold to-yellow-400 border-2 border-gold/50 rounded-full px-4 md:px-5 py-2 ml-2 shrink-0 shadow-lg animate-pulse">
+                <Bell className="w-5 h-5 md:w-6 md:h-6 text-white shrink-0 drop-shadow-sm" />
+                <span className="text-white text-sm md:text-base font-bold bg-black/20 px-2 py-0.5 rounded-full">{notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes}</span>
               </div>
             }
           </div>
