@@ -58,6 +58,15 @@ export const sendEmail = async (
 
 export const generateAndSendNotifications = async (event: 'registration' | 'order_placed' | 'order_status_update', userId: string, orderId?: string) => {
   try {
+    // Ensure we have a valid session
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+    if (sessionError || !sessionData.session) {
+      console.error('No valid session for notification:', sessionError)
+      return false
+    }
+
+    console.log('Calling generate-notification with session:', !!sessionData.session.access_token)
+
     const { data, error } = await supabase.functions.invoke('generate-notification', {
       body: {
         event,
@@ -71,10 +80,13 @@ export const generateAndSendNotifications = async (event: 'registration' | 'orde
       return false
     }
 
+    console.log('Generated notifications:', data.notifications)
+
     const notifications = data.notifications
 
     // Send each notification
     for (const notification of notifications) {
+      console.log('Sending notification:', notification.type, notification.recipient)
       await sendNotification(
         notification.type,
         notification.event,
