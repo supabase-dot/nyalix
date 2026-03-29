@@ -112,6 +112,9 @@ const Cart = () => {
 
     // Send order notifications
     await generateAndSendNotifications('order_placed', user.id, order.id);
+    
+    // Show success toast
+    toast.success('Order placed successfully! Check your email for invoice.');
   };
 
   if (step === 'success') {

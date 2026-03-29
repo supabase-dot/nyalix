@@ -407,6 +407,9 @@ const Admin = () => {
 
     // Send status update notifications
     await generateAndSendNotifications('order_status_update', order.user_id, id);
+    
+    // Show additional notification about email being sent
+    toast.success('Status update email sent to customer');
   };
 
   const deleteOrder = async (id: string) => {
