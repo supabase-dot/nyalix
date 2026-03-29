@@ -117,6 +117,7 @@ TWILIO_WHATSAPP_NUMBER=your_twilio_whatsapp_number
 # Deploy all notification functions
 npx supabase functions deploy send-notification
 npx supabase functions deploy generate-notification
+npx supabase functions deploy send-email
 npx supabase functions deploy make-admin
 ```
 
@@ -167,6 +168,88 @@ To test the notification system:
 3. **Status Updates**: Change order status in admin panel
 
 Check the notifications table in Supabase to view sent notifications.
+
+---
+
+# Comprehensive Email System
+
+This project now includes a comprehensive email system using Supabase Edge Functions and Resend API.
+
+### Features
+
+- **User Invitations**: Send beautifully designed invitation emails
+- **Welcome Emails**: Automated welcome messages for new users
+- **Order Invoices**: Professional invoice emails with order details
+- **Order Status Updates**: Real-time status notifications
+- **Password Reset**: Secure password reset emails
+- **Email Logging**: Track all sent emails in the database
+
+### Email Types Supported
+
+1. **invitation**: User invitation emails with accept links
+2. **welcome**: Welcome emails for new registrations
+3. **order_invoice**: Complete order invoices with item details
+4. **order_status**: Order status update notifications
+5. **password_reset**: Password reset emails with secure links
+
+### Usage Examples
+
+#### Send an Invitation Email
+```typescript
+import { sendEmail } from '@/lib/notifications'
+
+await sendEmail('invitation', 'user@example.com', {
+  email: 'user@example.com',
+  invitation_url: 'https://nyalix.com/accept-invite?token=abc123'
+})
+```
+
+#### Send Order Invoice
+```typescript
+await sendEmail('order_invoice', 'customer@example.com', null, userId, orderId)
+```
+
+#### Send Welcome Email
+```typescript
+await sendEmail('welcome', 'newuser@example.com', null, userId)
+```
+
+### Email Templates
+
+All emails use responsive HTML templates with:
+- Professional branding
+- Mobile-friendly design
+- Gradient headers
+- Clear call-to-action buttons
+- Proper contact information
+
+### Database Logging
+
+All emails are automatically logged in the `email_logs` table with:
+- Email type and recipient
+- User and order associations
+- Send status and timestamp
+- Full audit trail
+
+### Setup Requirements
+
+1. **Resend API Key**: Set `RESEND_API_KEY` in Supabase Edge Functions environment
+2. **Domain Verification**: Verify `nyalix.com` in Resend dashboard
+3. **Database Migration**: Run the email logs table migration
+
+### Deployment
+
+```bash
+# Deploy the new email function
+npx supabase functions deploy send-email
+
+# Run database migrations
+npx supabase db push
+```
+
+### Integration with Supabase Auth
+
+For user invitations through Supabase Auth dashboard, configure SMTP settings as described in the main setup section. For custom invitation flows, use the Edge Function method above.
 
 ---
 

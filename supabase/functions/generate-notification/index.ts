@@ -219,8 +219,8 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
     </head>
     <body>
       <div class="header">
-        <img src="https://your-logo-url.com/logo.png" alt="Nyalix Medical PVT LTD" style="max-width: 200px;">
-        <h1>Welcome to Nyalix Medical PVT LTD!</h1>
+        <h1 style="color: #17455a; margin: 0;">Nyalix Global Care</h1>
+        <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Welcome to Our Platform!</h2>
       </div>
       <div class="content">
         <h2>Dear ${profile.full_name},</h2>
@@ -232,10 +232,11 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
           <li><strong>Country:</strong> ${profile.country || 'Not specified'}</li>
         </ul>
         <p>You can now browse our catalog of medical equipment and place orders.</p>
-        <p>If you have any questions, please don't hesitate to contact us.</p>
+        <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
         <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>This is an automated welcome message. Please do not reply to this email.</p>
       </div>
     </body>
     </html>
@@ -269,8 +270,8 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
     </head>
     <body>
       <div class="header">
-        <img src="https://your-logo-url.com/logo.png" alt="Nyalix Global Care" style="max-width: 200px;">
-        <h1>Order Invoice</h1>
+        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
+        <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Order Invoice</h2>
       </div>
       <div class="content">
         <h2>Order ID: ${order.id}</h2>
@@ -306,9 +307,11 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
         </table>
         
         <p>Thank you for your business!</p>
+        <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2024 Nyalix Global Care. All rights reserved.</p>
+        <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>This is an automated invoice. Please do not reply to this email.</p>
       </div>
     </body>
     </html>
@@ -338,18 +341,19 @@ function generateStatusUpdateEmail(profile: ProfileRecord, order: OrderRecord): 
     </head>
     <body>
       <div class="header">
-        <img src="https://your-logo-url.com/logo.png" alt="Nyalix Global Care" style="max-width: 200px;">
-        <h1>Order Status Update</h1>
+        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
+        <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Order Status Update</h2>
       </div>
       <div class="content">
         <h2>Order ID: ${order.id}</h2>
         <p>Dear ${profile.full_name},</p>
         <p class="status">Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
         <p>${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}</p>
-        <p>If you have any questions, please contact our support team.</p>
+        <p>If you have any questions, please contact our support team at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2024 Nyalix Global Care. All rights reserved.</p>
+        <p>&copy; 2024 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>This is an automated message. Please do not reply to this email.</p>
       </div>
     </body>
     </html>
