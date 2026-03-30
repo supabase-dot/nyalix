@@ -920,12 +920,12 @@ const Admin = () => {
                 if (!productSearch.trim()) return true;
                 const searchTerm = productSearch.toLowerCase();
                 return (
-                  p.name.toLowerCase().includes(searchTerm) ||
-                  p.name_ar.toLowerCase().includes(searchTerm) ||
-                  p.description.toLowerCase().includes(searchTerm) ||
-                  p.description_ar.toLowerCase().includes(searchTerm) ||
-                  p.category.toLowerCase().includes(searchTerm) ||
-                  p.category_ar.toLowerCase().includes(searchTerm)
+                  (p.name?.toLowerCase() || '').includes(searchTerm) ||
+                  (p.name_ar?.toLowerCase() || '').includes(searchTerm) ||
+                  (p.description?.toLowerCase() || '').includes(searchTerm) ||
+                  (p.description_ar?.toLowerCase() || '').includes(searchTerm) ||
+                  (p.category?.toLowerCase() || '').includes(searchTerm) ||
+                  (p.category_ar?.toLowerCase() || '').includes(searchTerm)
                 );
               });
 
@@ -1158,10 +1158,10 @@ const Admin = () => {
                       if (!categorySearch.trim()) return true;
                       const searchTerm = categorySearch.toLowerCase();
                       return (
-                        cat.name.toLowerCase().includes(searchTerm) ||
-                        cat.name_ar.toLowerCase().includes(searchTerm) ||
-                        (cat.description && cat.description.toLowerCase().includes(searchTerm)) ||
-                        (cat.description_ar && cat.description_ar.toLowerCase().includes(searchTerm))
+                        (cat.name?.toLowerCase() || '').includes(searchTerm) ||
+                        (cat.name_ar?.toLowerCase() || '').includes(searchTerm) ||
+                        (cat.description?.toLowerCase() || '').includes(searchTerm) ||
+                        (cat.description_ar?.toLowerCase() || '').includes(searchTerm)
                       );
                     });
 
@@ -1267,11 +1267,11 @@ const Admin = () => {
 
                 return (
                   statusMatch ||
-                  o.shipping_name.toLowerCase().includes(searchTerm) ||
-                  o.shipping_email?.toLowerCase().includes(searchTerm) ||
-                  o.id.toLowerCase().includes(searchTerm) ||
-                  o.shipping_country?.toLowerCase().includes(searchTerm) ||
-                  o.shipping_city?.toLowerCase().includes(searchTerm)
+                  (o.shipping_name?.toLowerCase() || '').includes(searchTerm) ||
+                  (o.shipping_email?.toLowerCase() || '').includes(searchTerm) ||
+                  (o.id?.toLowerCase() || '').includes(searchTerm) ||
+                  (o.shipping_country?.toLowerCase() || '').includes(searchTerm) ||
+                  (o.shipping_city?.toLowerCase() || '').includes(searchTerm)
                 );
               });
 
@@ -1505,7 +1505,7 @@ const NewsletterTab = () => {
   // Filter and sort subscribers
   const filteredSubscribers = subscribers
     .filter((s) => {
-      const matchesSearch = s.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = (s.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
       const matchesReadFilter = readFilter === 'All' || 
         (readFilter === 'Read' && s.read) || 
         (readFilter === 'Unread' && !s.read);
