@@ -206,11 +206,18 @@ const Profile = () => {
   }, [user]);
   const fetchQuotes = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('quote_requests')
       .select('*')
-      .eq('email', user.email)
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching quotes:', error);
+      toast.error('Unable to load quotes');
+      return;
+    }
+
     setQuotes(data as QuoteRequest[] ?? []);
   }, [user]);
   useEffect(() => {

@@ -1897,25 +1897,55 @@ const CertificatesTab = () => {
 
   const uploadCert = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const file = formData.get('file') as File;
-    if (!file) return;
+    const title = formData.get('title') as string;
+    const titleAr = formData.get('title_ar') as string;
+    const type = formData.get('type') as string;
+
+    if (!file) {
+      toast.error('Please select a file to upload');
+      return;
+    }
+
+    if (!title?.trim()) {
+      toast.error('Please enter a title for the certificate');
+      return;
+    }
+
     setUploading(true);
-    const path = `${Date.now()}-${file.name}`;
-    const { error: uploadErr } = await supabase.storage.from('certificates').upload(path, file);
-    if (uploadErr) {toast.error(uploadErr.message);setUploading(false);return;}
-    const { data: urlData } = supabase.storage.from('certificates').getPublicUrl(path);
-    const { error } = await supabase.from('certificates').insert({
-      title: formData.get('title') as string,
-      title_ar: formData.get('title_ar') as string || '',
-      type: formData.get('type') as string || 'ISO',
-      file_url: urlData.publicUrl
-    });
-    setUploading(false);
-    if (error) {toast.error(error.message);return;}
-    toast.success('Certificate uploaded');
-    e.currentTarget.reset();
-    fetchCerts();
+    try {
+      const path = `${Date.now()}-${file.name}`;
+      const { error: uploadErr } = await supabase.storage.from('certificates').upload(path, file);
+      if (uploadErr) {
+        throw new Error(uploadErr.message);
+      }
+
+      const { data: urlData } = supabase.storage.from('certificates').getPublicUrl(path);
+      const { error } = await supabase.from('certificates').insert({
+        title: title.trim(),
+        title_ar: titleAr?.trim() || '',
+        type: type || 'ISO',
+        file_url: urlData.publicUrl
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      toast.success('Certificate uploaded successfully');
+      // Safely reset the form
+      if (form && typeof form.reset === 'function') {
+        form.reset();
+      }
+      fetchCerts();
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to upload certificate');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const deleteCert = async (id: string) => {
@@ -1945,8 +1975,26 @@ const CertificatesTab = () => {
       <div className="grid gap-3">
         {certs.map((c) =>
         <div key={c.id} className="flex items-center gap-4 bg-card rounded-xl border border-border p-4 shadow-luxury">
+            <div className="flex items-center gap-3 flex-1">
+              <Award className="w-8 h-8 text-primary" />
+              <div className="flex-1">
+                <h4 className="font-semibold text-foreground">{c.title}</h4>
+                {c.title_ar && <p className="text-sm text-muted-foreground">{c.title_ar}</p>}
+              </div>
+            </div>
             <span className="px-2 py-1 rounded bg-accent/20 text-accent text-xs font-bold">{c.type}</span>
-            <button onClick={() => deleteCert(c.id)} className="text-destructive hover:text-destructive/80"><Trash2 className="w-4 h-4" /></button>
+            <a
+              href={c.file_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
+              title="View Certificate"
+            >
+              <Eye className="w-4 h-4" />
+            </a>
+            <button onClick={() => deleteCert(c.id)} className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors">
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
         )}
       </div>

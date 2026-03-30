@@ -5,7 +5,7 @@ interface EmailRequest {
   type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved'
   to: string
   subject?: string
-  data?: any
+  data?: Record<string, unknown>
   userId?: string
   orderId?: string
   quoteId?: string
@@ -98,9 +98,9 @@ Deno.serve(async (req) => {
 })
 
 async function generateEmailContent(
-  supabaseClient: any,
+  supabaseClient: ReturnType<typeof createClient>,
   type: string,
-  data: any,
+  data: Record<string, unknown>,
   userId?: string,
   orderId?: string
 ): Promise<{ subject: string; html: string } | null> {
@@ -134,7 +134,7 @@ async function generateEmailContent(
   }
 }
 
-function generateInvitationEmail(data: any): { subject: string; html: string } {
+function generateInvitationEmail(data: { email: string; invitation_url: string }): { subject: string; html: string } {
   const { email, invitation_url } = data
 
   return {
@@ -182,7 +182,7 @@ function generateInvitationEmail(data: any): { subject: string; html: string } {
   }
 }
 
-async function generateWelcomeEmail(supabaseClient: any, userId: string): Promise<{ subject: string; html: string } | null> {
+async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClient>, userId: string): Promise<{ subject: string; html: string } | null> {
   const { data: profile, error } = await supabaseClient
     .from('profiles')
     .select('*')
@@ -239,7 +239,7 @@ async function generateWelcomeEmail(supabaseClient: any, userId: string): Promis
   }
 }
 
-async function generateOrderInvoiceEmail(supabaseClient: any, userId: string, orderId: string): Promise<{ subject: string; html: string } | null> {
+async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof createClient>, userId: string, orderId: string): Promise<{ subject: string; html: string } | null> {
   // Get user profile
   const { data: profile, error: profileError } = await supabaseClient
     .from('profiles')
@@ -265,7 +265,7 @@ async function generateOrderInvoiceEmail(supabaseClient: any, userId: string, or
 
   if (orderError || !order) return null
 
-  const itemsHtml = order.order_items?.map((item: any) => `
+  const itemsHtml = order.order_items?.map((item: { product_name: string; quantity: number; price: number }) => `
     <tr>
       <td class="product-name">${item.product_name}</td>
       <td class="quantity">${item.quantity}</td>
@@ -646,7 +646,7 @@ async function generateOrderInvoiceEmail(supabaseClient: any, userId: string, or
   }
 }
 
-async function generateOrderStatusEmail(supabaseClient: any, userId: string, orderId: string, status: string): Promise<{ subject: string; html: string } | null> {
+async function generateOrderStatusEmail(supabaseClient: ReturnType<typeof createClient>, userId: string, orderId: string, status: string): Promise<{ subject: string; html: string } | null> {
   const { data: profile, error: profileError } = await supabaseClient
     .from('profiles')
     .select('*')
@@ -713,7 +713,7 @@ async function generateOrderStatusEmail(supabaseClient: any, userId: string, ord
   }
 }
 
-function generatePasswordResetEmail(data: any): { subject: string; html: string } {
+function generatePasswordResetEmail(data: { reset_url: string }): { subject: string; html: string } {
   const { reset_url } = data
 
   return {
@@ -761,7 +761,7 @@ function generatePasswordResetEmail(data: any): { subject: string; html: string 
   }
 }
 
-async function generateQuotePendingEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof createClient>, quoteId: string): Promise<{ subject: string; html: string } | null> {
   const { data: quote, error } = await supabaseClient
     .from('quote_requests')
     .select('*')
@@ -820,7 +820,7 @@ async function generateQuotePendingEmail(supabaseClient: any, quoteId: string): 
   }
 }
 
-async function generateQuoteRespondedEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof createClient>, quoteId: string): Promise<{ subject: string; html: string } | null> {
   const { data: quote, error } = await supabaseClient
     .from('quote_requests')
     .select('*')
@@ -885,7 +885,7 @@ async function generateQuoteRespondedEmail(supabaseClient: any, quoteId: string)
   }
 }
 
-async function generateQuoteApprovedEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof createClient>, quoteId: string): Promise<{ subject: string; html: string } | null> {
   const { data: quote, error } = await supabaseClient
     .from('quote_requests')
     .select('*')

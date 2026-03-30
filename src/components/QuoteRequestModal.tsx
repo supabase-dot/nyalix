@@ -6,12 +6,14 @@ import { toast } from 'sonner';
 import { X, Send, Building2, Mail, Phone, Globe, Package, MessageSquare } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { validatePhone } from '@/lib/validation';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface QuoteRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
   productId?: string;
   productName?: string;
+  onSuccess?: () => void;
 }
 
 export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
@@ -19,9 +21,11 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   onClose,
   productId = '',
   productName = '',
+  onSuccess,
 }) => {
   const { t } = useTranslation();
   const { isRTL } = useLanguage();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
     company: '',
@@ -61,6 +65,12 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if user is logged in
+    if (!user) {
+      toast.error('Please log in to submit a quote request');
+      return;
+    }
+
     // Validation
     if (
       !formData.name ||
@@ -92,6 +102,7 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
 
     try {
       const { error } = await supabase.from('quote_requests').insert({
+        user_id: user.id,
         name: formData.name,
         company: formData.company,
         email: formData.email,
@@ -120,6 +131,7 @@ export const QuoteRequestModal: React.FC<QuoteRequestModalProps> = ({
         quantity: 1,
         message: '',
       });
+      onSuccess?.();
       onClose();
     } catch (err) {
       toast.error(t('quote.generalError'));

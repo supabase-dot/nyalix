@@ -194,7 +194,7 @@ const AdminQuotesTab = () => {
     const totalAmount = subtotal + taxAmount;
 
     // First, try to update with pricing fields
-    let updateData: any = {
+    let updateData: Record<string, string | number> = {
       status: 'Approved'
     };
 
