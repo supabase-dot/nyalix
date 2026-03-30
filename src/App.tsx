@@ -30,6 +30,7 @@ import UserSettings from "./pages/UserSettings";
 import NotFound from "./pages/NotFound";
 import Exhibitions from "./pages/Exhibitions";
 import ExhibitionDetail from "./pages/ExhibitionDetail";
+import Invoice from "./pages/Invoice";
 
 const queryClient = new QueryClient();
 
@@ -61,6 +62,7 @@ const App = () => (
                   <Route path="/admin/dashboard" element={<ProtectedRoute element={<Admin />} requiredRole="admin" />} />
                   <Route path="/profile" element={<ProtectedRoute element={<Profile />} requiredRole="user" />} />
                   <Route path="/settings" element={<ProtectedRoute element={<UserSettings />} requiredRole="user" />} />
+                  <Route path="/invoice/:id" element={<ProtectedRoute element={<Invoice />} requiredRole="user" />} />
                   <Route path="/warranty" element={<Warranty />} />
                   <Route path="/quality" element={<Quality />} />
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />

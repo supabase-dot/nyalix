@@ -159,6 +159,8 @@ const resources = {
           quoteDeleted: "Quote request deleted",
           markAsRead: "Mark as read",
           enterResponse: "Enter your response...",
+          emailSent: "Email notification sent",
+          emailFailed: "Failed to send email notification",
         },
       },
       order: {
@@ -478,6 +480,8 @@ const resources = {
           quoteDeleted: "تم حذف طلب عرض السعر",
           markAsRead: "تحديد كمقروء",
           enterResponse: "أدخل ردك...",
+          emailSent: "تم إرسال إشعار البريد الإلكتروني",
+          emailFailed: "فشل في إرسال إشعار البريد الإلكتروني",
         },
       },
       order: {

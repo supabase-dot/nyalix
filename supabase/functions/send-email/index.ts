@@ -2,12 +2,13 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 interface EmailRequest {
-  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset'
+  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved'
   to: string
   subject?: string
   data?: any
   userId?: string
   orderId?: string
+  quoteId?: string
 }
 
 interface UserProfile {
@@ -115,6 +116,15 @@ async function generateEmailContent(
 
     case 'order_status':
       return await generateOrderStatusEmail(supabaseClient, userId!, orderId!, data?.status)
+
+    case 'quote_pending':
+      return await generateQuotePendingEmail(supabaseClient, data?.quoteId)
+
+    case 'quote_responded':
+      return await generateQuoteRespondedEmail(supabaseClient, data?.quoteId)
+
+    case 'quote_approved':
+      return await generateQuoteApprovedEmail(supabaseClient, data?.quoteId)
 
     case 'password_reset':
       return generatePasswordResetEmail(data)
@@ -743,6 +753,302 @@ function generatePasswordResetEmail(data: any): { subject: string; html: string 
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
             <p>This is an automated password reset email. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+async function generateQuotePendingEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+  const { data: quote, error } = await supabaseClient
+    .from('quote_requests')
+    .select('*')
+    .eq('id', quoteId)
+    .single()
+
+  if (error || !quote) return null
+
+  return {
+    subject: 'Quote Request Received - Nyalix Medical PVT LTD',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quote Request Received</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+          .header { background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 30px 20px; text-align: center; }
+          .content { padding: 30px 20px; color: #333; }
+          .quote-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>Quote Request Received</h2>
+          </div>
+          <div class="content">
+            <h3>Dear ${quote.name},</h3>
+            <p>Thank you for your interest in our medical equipment. We have received your quote request and our team is reviewing it.</p>
+            
+            <div class="quote-details">
+              <h4>Quote Request Details:</h4>
+              <p><strong>Product:</strong> ${quote.product_name}</p>
+              <p><strong>Quantity:</strong> ${quote.quantity}</p>
+              <p><strong>Company:</strong> ${quote.company}</p>
+              <p><strong>Request ID:</strong> ${quote.id}</p>
+            </div>
+
+            <p>Our sales team will respond to your request within 24-48 hours with pricing and availability information.</p>
+            <p>If you have any urgent questions, please contact us at info@nyalix.com or call +1 (234) 567-8900.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>This is an automated confirmation. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+async function generateQuoteRespondedEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+  const { data: quote, error } = await supabaseClient
+    .from('quote_requests')
+    .select('*')
+    .eq('id', quoteId)
+    .single()
+
+  if (error || !quote) return null
+
+  return {
+    subject: 'Quote Response - Nyalix Medical PVT LTD',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quote Response</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+          .header { background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 30px 20px; text-align: center; }
+          .content { padding: 30px 20px; color: #333; }
+          .quote-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; }
+          .response-box { background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #17455a; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>Quote Response</h2>
+          </div>
+          <div class="content">
+            <h3>Dear ${quote.name},</h3>
+            <p>Thank you for your quote request. Our sales team has reviewed your requirements and prepared a quotation for you.</p>
+            
+            <div class="quote-details">
+              <h4>Quote Request Details:</h4>
+              <p><strong>Product:</strong> ${quote.product_name}</p>
+              <p><strong>Quantity:</strong> ${quote.quantity}</p>
+              <p><strong>Company:</strong> ${quote.company}</p>
+              <p><strong>Request ID:</strong> ${quote.id}</p>
+            </div>
+
+            <div class="response-box">
+              <h4>Our Response:</h4>
+              <p>${quote.admin_response || 'Please contact us for detailed pricing and availability.'}</p>
+            </div>
+
+            <p>If this quotation meets your requirements, please let us know and we can proceed with the order.</p>
+            <p>For any questions or to discuss this further, please contact our sales team at info@nyalix.com or call +1 (234) 567-8900.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>This is an automated response. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+async function generateQuoteApprovedEmail(supabaseClient: any, quoteId: string): Promise<{ subject: string; html: string } | null> {
+  const { data: quote, error } = await supabaseClient
+    .from('quote_requests')
+    .select('*')
+    .eq('id', quoteId)
+    .single()
+
+  if (error || !quote) return null
+
+  // Use actual pricing from the quote record
+  const unitPrice = quote.unit_price || 100.00;
+  const taxRate = quote.tax_rate || 0.08;
+  const quantity = quote.quantity;
+  const subtotal = unitPrice * quantity;
+  const taxAmount = quote.tax_amount || (subtotal * taxRate);
+  const total = quote.total_amount || (subtotal + taxAmount);
+
+  return {
+    subject: `Invoice - Quote Approved - ${quote.id}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Invoice - Quote Approved</title>
+        <style>
+          body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 0; background-color: #f6f6f6; }
+          .email-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+          .header { background: linear-gradient(135deg, #17455a 0%, #2d6a8a 100%); color: white; padding: 40px 30px; text-align: center; }
+          .header h1 { margin: 0; font-size: 28px; font-weight: 300; letter-spacing: 1px; }
+          .header h2 { margin: 10px 0 0 0; font-size: 16px; font-weight: 400; opacity: 0.9; }
+          .content { padding: 0; }
+          .invoice-info { background-color: #f8f9fa; padding: 25px 30px; border-bottom: 1px solid #e9ecef; }
+          .invoice-id { font-size: 18px; font-weight: bold; color: #17455a; margin: 0 0 15px 0; }
+          .invoice-date { color: #6c757d; font-size: 14px; margin: 0; }
+          .customer-section { padding: 30px; background-color: #ffffff; }
+          .section-title { font-size: 16px; font-weight: bold; color: #17455a; margin: 0 0 15px 0; border-bottom: 2px solid #17455a; padding-bottom: 5px; }
+          .customer-details { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+          .detail-row { display: flex; margin-bottom: 8px; }
+          .detail-label { font-weight: bold; color: #495057; min-width: 80px; flex-shrink: 0; }
+          .detail-value { color: #212529; }
+          .order-table { width: 100%; border-collapse: collapse; margin: 25px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+          .order-table th { background-color: #17455a; color: white; padding: 15px; text-align: left; font-weight: 600; font-size: 14px; }
+          .order-table td { padding: 15px; border-bottom: 1px solid #e9ecef; background-color: #ffffff; }
+          .product-name { font-weight: 500; color: #212529; }
+          .quantity, .price, .total { text-align: center; font-weight: 500; }
+          .pricing-section { background-color: #f8f9fa; padding: 25px 30px; border-top: 1px solid #e9ecef; }
+          .pricing-breakdown { max-width: 300px; margin-left: auto; }
+          .pricing-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e9ecef; }
+          .pricing-row:last-child { border-bottom: none; border-top: 2px solid #17455a; margin-top: 10px; padding-top: 15px; font-size: 18px; font-weight: bold; color: #17455a; }
+          .pricing-label { color: #495057; }
+          .pricing-value { font-weight: 500; color: #212529; }
+          .cta-section { padding: 30px; text-align: center; background-color: #ffffff; }
+          .cta-button { display: inline-block; background-color: #17455a; color: white; text-decoration: none; padding: 12px 30px; border-radius: 6px; font-weight: 500; margin: 0 10px 10px 0; transition: background-color 0.3s ease; }
+          .cta-button:hover { background-color: #0d3445; }
+          .footer { background-color: #17455a; color: white; padding: 30px; text-align: center; }
+          .footer-content { max-width: 400px; margin: 0 auto; }
+          .footer h3 { margin: 0 0 15px 0; font-size: 16px; font-weight: 400; }
+          .footer p { margin: 5px 0; font-size: 13px; opacity: 0.9; }
+          .footer a { color: #4dabf7; text-decoration: none; }
+          .footer a:hover { text-decoration: underline; }
+        </style>
+      </head>
+      <body>
+        <div class="email-container">
+          <!-- Header -->
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>Invoice</h2>
+          </div>
+
+          <!-- Invoice Info -->
+          <div class="invoice-info">
+            <p class="invoice-id">Invoice #${quote.id}</p>
+            <p class="invoice-date">Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+
+          <!-- Customer Details -->
+          <div class="customer-section">
+            <h3 class="section-title">Bill To</h3>
+            <div class="customer-details">
+              <div class="detail-row">
+                <span class="detail-label">Name:</span>
+                <span class="detail-value">${quote.name}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Company:</span>
+                <span class="detail-value">${quote.company}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">${quote.email}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">${quote.phone}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Country:</span>
+                <span class="detail-value">${quote.country}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="customer-section">
+            <h3 class="section-title">Order Summary</h3>
+            <table class="order-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th style="text-align: center;">Quantity</th>
+                  <th style="text-align: center;">Unit Price</th>
+                  <th style="text-align: center;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="product-name">${quote.product_name}</td>
+                  <td class="quantity">${quantity}</td>
+                  <td class="price">$${unitPrice.toFixed(2)}</td>
+                  <td class="total">$${subtotal.toFixed(2)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pricing Breakdown -->
+          <div class="pricing-section">
+            <div class="pricing-breakdown">
+              <div class="pricing-row">
+                <span class="pricing-label">Subtotal:</span>
+                <span class="pricing-value">$${subtotal.toFixed(2)}</span>
+              </div>
+              <div class="pricing-row">
+                <span class="pricing-label">Tax (${(taxRate * 100).toFixed(1)}%):</span>
+                <span class="pricing-value">$${taxAmount.toFixed(2)}</span>
+              </div>
+              <div class="pricing-row">
+                <span class="pricing-label">Total:</span>
+                <span class="pricing-value">$${total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Call to Action -->
+          <div class="cta-section">
+            <a href="https://nyalix.com/checkout?quote=${quote.id}" class="cta-button">Complete Purchase</a>
+            <a href="https://nyalix.com/contact" class="cta-button">Contact Support</a>
+            <p style="margin-top: 20px; color: #6c757d; font-size: 14px;">
+              Thank you for choosing Nyalix Medical PVT LTD for your medical equipment needs!
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div class="footer">
+            <div class="footer-content">
+              <h3>Need Help?</h3>
+              <p><a href="mailto:info@nyalix.com">info@nyalix.com</a></p>
+              <p><a href="tel:+1234567890">+1 (234) 567-8900</a></p>
+              <p>24/7 Customer Support Available</p>
+              <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            </div>
           </div>
         </div>
       </body>

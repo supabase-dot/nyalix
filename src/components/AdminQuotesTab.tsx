@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
+import { sendEmail } from '@/lib/notifications';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import {
@@ -35,6 +36,10 @@ interface QuoteRequest {
   admin_responded_at: string | null;
   read: boolean;
   created_at: string;
+  unit_price?: number;
+  tax_rate?: number;
+  tax_amount?: number;
+  total_amount?: number;
 }
 
 const AdminQuotesTab = () => {
@@ -48,6 +53,11 @@ const AdminQuotesTab = () => {
   } | null>(null);
   const [statusFilter, setStatusFilter] = useState<'All' | 'Pending' | 'Responded' | 'Approved'>('All');
   const [showArchived, setShowArchived] = useState(false);
+  const [approvingQuote, setApprovingQuote] = useState<QuoteRequest | null>(null);
+  const [pricingData, setPricingData] = useState({
+    unitPrice: '',
+    taxRate: '8'
+  });
 
   const fetchQuotes = useCallback(async () => {
     setLoading(true);
@@ -91,6 +101,18 @@ const AdminQuotesTab = () => {
   };
 
   const updateStatus = async (id: string, status: 'Pending' | 'Responded' | 'Approved') => {
+    if (status === 'Approved') {
+      const quote = quotes.find(q => q.id === id);
+      if (quote) {
+        setApprovingQuote(quote);
+        setPricingData({
+          unitPrice: quote.unit_price?.toString() || '',
+          taxRate: ((quote.tax_rate || 0.08) * 100).toString()
+        });
+      }
+      return;
+    }
+
     const { error } = await supabase
       .from('quote_requests')
       .update({ status })
@@ -105,6 +127,19 @@ const AdminQuotesTab = () => {
       prev.map((q) => (q.id === id ? { ...q, status } : q))
     );
     toast.success(t('quote.admin.statusUpdated'));
+
+    // Send email notification
+    try {
+      const quote = quotes.find(q => q.id === id);
+      if (quote) {
+        const emailType = status === 'Pending' ? 'quote_pending' : status === 'Responded' ? 'quote_responded' : 'quote_approved';
+        await sendEmail(emailType, quote.email, { quoteId: id });
+        toast.success(t('quote.admin.emailSent'));
+      }
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError);
+      toast.error(t('quote.admin.emailFailed'));
+    }
   };
 
   const saveResponse = async (id: string, response: string) => {
@@ -141,6 +176,92 @@ const AdminQuotesTab = () => {
     );
     setEditingResponse(null);
     toast.success(t('quote.admin.responseSaved'));
+  };
+
+  const approveQuoteWithPricing = async () => {
+    if (!approvingQuote) return;
+
+    const unitPrice = parseFloat(pricingData.unitPrice);
+    const taxRate = parseFloat(pricingData.taxRate) / 100;
+
+    if (!unitPrice || unitPrice <= 0) {
+      toast.error('Please enter a valid unit price');
+      return;
+    }
+
+    const subtotal = unitPrice * approvingQuote.quantity;
+    const taxAmount = subtotal * taxRate;
+    const totalAmount = subtotal + taxAmount;
+
+    // First, try to update with pricing fields
+    let updateData: any = {
+      status: 'Approved'
+    };
+
+    // Only add pricing fields if they exist in the database
+    try {
+      // Test if pricing columns exist by doing a simple select
+      const { data: testData } = await supabase
+        .from('quote_requests')
+        .select('unit_price')
+        .limit(1);
+
+      if (testData !== null) {
+        // Pricing columns exist, include them in update
+        updateData = {
+          status: 'Approved',
+          unit_price: unitPrice,
+          tax_rate: taxRate,
+          tax_amount: taxAmount,
+          total_amount: totalAmount
+        };
+      }
+    } catch (error) {
+      // Pricing columns don't exist yet, just update status
+      console.log('Pricing columns not available, updating status only');
+    }
+
+    const { error } = await supabase
+      .from('quote_requests')
+      .update(updateData)
+      .eq('id', approvingQuote.id);
+
+    if (error) {
+      console.error('Database update error:', error);
+      toast.error(t('quote.admin.failedToUpdate'));
+      return;
+    }
+
+    // Update local state
+    const updatedQuote = {
+      ...approvingQuote,
+      status: 'Approved' as const,
+      ...(updateData.unit_price && {
+        unit_price: unitPrice,
+        tax_rate: taxRate,
+        tax_amount: taxAmount,
+        total_amount: totalAmount
+      })
+    };
+
+    setQuotes((prev) =>
+      prev.map((q) =>
+        q.id === approvingQuote.id ? updatedQuote : q
+      )
+    );
+
+    toast.success(t('quote.admin.statusUpdated'));
+
+    // Send email notification
+    try {
+      await sendEmail('quote_approved', approvingQuote.email, { quoteId: approvingQuote.id });
+      toast.success(t('quote.admin.emailSent'));
+    } catch (emailError) {
+      console.error('Failed to send email:', emailError);
+      toast.error(t('quote.admin.emailFailed'));
+    }
+
+    setApprovingQuote(null);
   };
 
   const deleteQuote = async (id: string) => {
@@ -495,6 +616,73 @@ const AdminQuotesTab = () => {
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Pricing Modal for Quote Approval */}
+      {approvingQuote && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-xl border border-border p-6 shadow-luxury max-w-md w-full">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Set Pricing for Quote Approval</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Unit Price ($)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={pricingData.unitPrice}
+                  onChange={(e) => setPricingData(prev => ({ ...prev, unitPrice: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="100.00"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Tax Rate (%)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={pricingData.taxRate}
+                  onChange={(e) => setPricingData(prev => ({ ...prev, taxRate: e.target.value }))}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="8"
+                />
+              </div>
+
+              {pricingData.unitPrice && (
+                <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal:</span>
+                    <span>${(parseFloat(pricingData.unitPrice) * approvingQuote.quantity).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Tax ({pricingData.taxRate}%):</span>
+                    <span>${((parseFloat(pricingData.unitPrice) * approvingQuote.quantity) * (parseFloat(pricingData.taxRate) / 100)).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-semibold border-t pt-2">
+                    <span>Total:</span>
+                    <span>${((parseFloat(pricingData.unitPrice) * approvingQuote.quantity) * (1 + parseFloat(pricingData.taxRate) / 100)).toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setApprovingQuote(null)}
+                className="flex-1 px-4 py-2 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={approveQuoteWithPricing}
+                className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/80 transition-all"
+              >
+                Approve & Send Invoice
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

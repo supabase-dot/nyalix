@@ -51,6 +51,10 @@ interface QuoteRequest {
   admin_response: string | null;
   admin_responded_at: string | null;
   created_at: string;
+  unit_price?: number;
+  tax_rate?: number;
+  tax_amount?: number;
+  total_amount?: number;
 }
 
 const statusConfig: Record<string, { icon: LucideIcon; color: string; bg: string }> = {
@@ -486,6 +490,45 @@ const Profile = () => {
                             )}
                           </div>
                           <p className="text-sm text-foreground leading-relaxed">{quote.admin_response}</p>
+                        </div>
+                      )}
+
+                      {/* Pricing Information for Approved Quotes */}
+                      {quote.status === 'Approved' && quote.total_amount && (
+                        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 p-4 mb-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-semibold text-green-800 dark:text-green-200">Quote Approved</h4>
+                            <button
+                              onClick={() => window.open(`/invoice/${quote.id}`, '_blank')}
+                              className="px-3 py-1 bg-green-600 text-white text-xs rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              Download Invoice
+                            </button>
+                          </div>
+                          {quote.unit_price ? (
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <p className="text-green-700 dark:text-green-300">Unit Price</p>
+                                <p className="font-semibold text-green-800 dark:text-green-200">${quote.unit_price.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <p className="text-green-700 dark:text-green-300">Quantity</p>
+                                <p className="font-semibold text-green-800 dark:text-green-200">{quote.quantity}</p>
+                              </div>
+                              <div>
+                                <p className="text-green-700 dark:text-green-300">Tax ({((quote.tax_rate || 0) * 100).toFixed(1)}%)</p>
+                                <p className="font-semibold text-green-800 dark:text-green-200">${(quote.tax_amount || 0).toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <p className="text-green-700 dark:text-green-300">Total</p>
+                                <p className="font-semibold text-green-800 dark:text-green-200">${quote.total_amount.toFixed(2)}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-green-700 dark:text-green-300">
+                              Your quote has been approved. Contact us for pricing details.
+                            </p>
+                          )}
                         </div>
                       )}
 
