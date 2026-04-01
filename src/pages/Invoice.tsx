@@ -191,7 +191,7 @@ const Invoice = () => {
         <div className="bg-gray-100 px-8 py-6">
           <div className="text-center text-gray-600">
             <p className="font-semibold mb-2">Thank you for choosing Nyalix Medical PVT LTD</p>
-            <p>For any questions, please contact us at info@nyalix.com or call +1 (234) 567-8900</p>
+            <p>For any questions, please contact us at info@nyalixmed.com or call +971 50 123 4567</p>
             <p className="text-sm mt-4">&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
           </div>
         </div>

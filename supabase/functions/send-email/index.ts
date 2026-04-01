@@ -68,6 +68,7 @@ Deno.serve(async (req) => {
     const success = await sendEmail(to, emailContent.subject, emailContent.html)
 
     // Log the email
+    const logStatus = success ? 'sent' : 'failed'
     await supabaseClient
       .from('email_logs')
       .insert({
@@ -76,15 +77,27 @@ Deno.serve(async (req) => {
         subject: emailContent.subject,
         user_id: userId,
         order_id: orderId,
-        status: success ? 'sent' : 'failed',
+        status: logStatus,
         sent_at: new Date().toISOString()
       })
 
+    if (!success) {
+      const errorMessage = 'send-email function: email send failed (Resend request failed). Ensure RESEND_API_KEY is configured and the recipient email is valid.'
+      console.error(errorMessage)
+      return new Response(
+        JSON.stringify({ success: false, error: errorMessage }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 500
+        }
+      )
+    }
+
     return new Response(
-      JSON.stringify({ success }),
+      JSON.stringify({ success: true }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: success ? 200 : 500
+        status: 200
       }
     )
   } catch (error) {
@@ -147,7 +160,7 @@ function generateInvitationEmail(data: { email: string; invitation_url: string }
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>You're invited to join Nyalix Global Care</title>
+        <title>You're invited to join Nyalix Global Medical PVT LTD</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
@@ -160,7 +173,7 @@ function generateInvitationEmail(data: { email: string; invitation_url: string }
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Global Care</h1>
+            <h1>Nyalix Medical PVT LTD</h1>
             <p>Medical Equipment Excellence</p>
           </div>
           <div class="content">
@@ -228,7 +241,7 @@ async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClie
             </ul>
             <p>You can now browse our catalog of medical equipment and place orders.</p>
             <a href="https://nyalix.com" class="button">Start Shopping</a>
-            <p>If you have any questions, please contact us at info@nyalix.com</p>
+            <p>If you have any questions, please contact us at info@nyalixmed.com</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -635,8 +648,8 @@ async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof creat
           <div class="footer">
             <div class="footer-content">
               <h3>Need Help?</h3>
-              <p><a href="mailto:info@nyalix.com">info@nyalix.com</a></p>
-              <p><a href="tel:+1234567890">+1 (234) 567-8900</a></p>
+              <p><a href="mailto: info@nyalixmed.com"> info@nyalixmed.com</a></p>
+              <p><a href="tel:+917339700569">+917339700569</a></p>
               <p>24/7 Customer Support Available</p>
               <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
             </div>
@@ -702,7 +715,7 @@ async function generateOrderStatusEmail(supabaseClient: ReturnType<typeof create
             <p>Dear ${profile.full_name},</p>
             <div class="status-badge" style="background-color: ${statusColors[status] || '#6c757d'};">Status: ${status.charAt(0).toUpperCase() + status.slice(1)}</div>
             <p>${statusMessages[status] || 'Your order status has been updated.'}</p>
-            <p>If you have any questions, please contact our support team at info@nyalix.com</p>
+            <p>If you have any questions, please contact our support team at info@nyalixmed.com</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -809,7 +822,7 @@ async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof creat
             </div>
 
             <p>Our sales team will respond to your request within 24-48 hours with pricing and availability information.</p>
-            <p>If you have any urgent questions, please contact us at info@nyalix.com or call +1 (234) 567-8900.</p>
+            <p>If you have any urgent questions, please contact us at info@nyalixmed.com or call +917339700569.</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -874,7 +887,7 @@ async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof cre
             </div>
 
             <p>If this quotation meets your requirements, please let us know and we can proceed with the order.</p>
-            <p>For any questions or to discuss this further, please contact our sales team at info@nyalix.com or call +1 (234) 567-8900.</p>
+            <p>For any questions or to discuss this further, please contact our sales team at info@nyalixmed.com or call +917339700569.</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -1046,8 +1059,8 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
           <div class="footer">
             <div class="footer-content">
               <h3>Need Help?</h3>
-              <p><a href="mailto:info@nyalix.com">info@nyalix.com</a></p>
-              <p><a href="tel:+1234567890">+1 (234) 567-8900</a></p>
+              <p><a href="mailto:info@nyalixmed.com">info@nyalixmed.com</a></p>
+              <p><a href="tel:+917339700569">+917339700569</a></p>
               <p>24/7 Customer Support Available</p>
               <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
             </div>
@@ -1062,8 +1075,8 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
 async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
   const resendApiKey = Deno.env.get('RESEND_API_KEY')
   if (!resendApiKey) {
-    console.warn('RESEND_API_KEY not set - email not sent, but function succeeded')
-    return true // Return true for now to not break the flow
+    console.error('RESEND_API_KEY not set - cannot send email')
+    return false
   }
 
   try {
@@ -1074,14 +1087,20 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Nyalix Medical PVT LTD <info@nyalix.com>',
+        from: 'Nyalix Medical PVT LTD <info@nyalixmed.com>',
         to: [to],
         subject,
         html
       })
     })
 
-    return response.ok
+    if (!response.ok) {
+      const bodyText = await response.text()
+      console.error('Resend API error', response.status, bodyText)
+      return false
+    }
+
+    return true
   } catch (error) {
     console.error('Error sending email:', error)
     return false

@@ -232,7 +232,7 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
           <li><strong>Country:</strong> ${profile.country || 'Not specified'}</li>
         </ul>
         <p>You can now browse our catalog of medical equipment and place orders.</p>
-        <p>If you have any questions, please contact us at info@nyalix.com</p>
+        <p>If you have any questions, please contact us at info@nyalixmed.com</p>
       </div>
       <div class="footer">
         <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -307,7 +307,7 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
         </table>
         
         <p>Thank you for your business!</p>
-        <p>If you have any questions, please contact us at info@nyalix.com</p>
+        <p>If you have any questions, please contact us at info@nyalixmed.com</p>
       </div>
       <div class="footer">
         <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -349,7 +349,7 @@ function generateStatusUpdateEmail(profile: ProfileRecord, order: OrderRecord): 
         <p>Dear ${profile.full_name},</p>
         <p class="status">Status: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
         <p>${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}</p>
-        <p>If you have any questions, please contact our support team at info@nyalix.com</p>
+        <p>If you have any questions, please contact our support team at info@nyalixmed.com</p>
       </div>
       <div class="footer">
         <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
