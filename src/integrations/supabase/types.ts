@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.4"
+  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -124,6 +129,39 @@ export type Database = {
         }
         Relationships: []
       }
+      email_logs: {
+        Row: {
+          id: string
+          order_id: string | null
+          recipient: string
+          sent_at: string
+          status: string
+          subject: string | null
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          order_id?: string | null
+          recipient: string
+          sent_at?: string
+          status: string
+          subject?: string | null
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          order_id?: string | null
+          recipient?: string
+          sent_at?: string
+          status?: string
+          subject?: string | null
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       exhibition_media: {
         Row: {
           created_at: string
@@ -194,19 +232,19 @@ export type Database = {
           created_at: string
           email: string
           id: string
-          read: boolean
+          read: boolean | null
         }
         Insert: {
           created_at?: string
           email: string
           id?: string
-          read?: boolean
+          read?: boolean | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
-          read?: boolean
+          read?: boolean | null
         }
         Relationships: []
       }
@@ -381,7 +419,22 @@ export type Database = {
           review_text?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_product_reviews_order_id"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_product_reviews_product_id"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_views: {
         Row: {
@@ -411,8 +464,8 @@ export type Database = {
       }
       products: {
         Row: {
-          category: string
-          category_ar: string
+          category: string | null
+          category_ar: string | null
           category_id: string | null
           created_at: string
           description: string
@@ -429,8 +482,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          category?: string
-          category_ar?: string
+          category?: string | null
+          category_ar?: string | null
           category_id?: string | null
           created_at?: string
           description?: string
@@ -447,8 +500,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          category?: string
-          category_ar?: string
+          category?: string | null
+          category_ar?: string | null
           category_id?: string | null
           created_at?: string
           description?: string
@@ -512,6 +565,74 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      quote_requests: {
+        Row: {
+          admin_responded_at: string | null
+          admin_response: string | null
+          company: string
+          country: string
+          created_at: string | null
+          email: string
+          id: string
+          message: string | null
+          name: string
+          phone: string
+          product_id: string
+          product_name: string
+          quantity: number
+          read: boolean | null
+          status: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_responded_at?: string | null
+          admin_response?: string | null
+          company: string
+          country: string
+          created_at?: string | null
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          phone: string
+          product_id: string
+          product_name: string
+          quantity: number
+          read?: boolean | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_responded_at?: string | null
+          admin_response?: string | null
+          company?: string
+          country?: string
+          created_at?: string | null
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          phone?: string
+          product_id?: string
+          product_name?: string
+          quantity?: number
+          read?: boolean | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_requests_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -684,4 +805,3 @@ export const Constants = {
     },
   },
 } as const
-

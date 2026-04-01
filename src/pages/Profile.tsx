@@ -205,20 +205,27 @@ const Profile = () => {
     setReviews(data as unknown as Review[] ?? []);
   }, [user]);
   const fetchQuotes = useCallback(async () => {
-    if (!user) return;
-    const { data, error } = await supabase
-      .from('quote_requests')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
+    if (!user || !user.id) return;
+    
+    try {
+      // Direct query with user_id filter (now that API schema is refreshed)
+      const { data, error } = await supabase
+        .from('quote_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching quotes:', error);
+      if (error) {
+        console.error('Error fetching quotes:', error);
+        toast.error('Unable to load quotes');
+        return;
+      }
+
+      setQuotes(data as QuoteRequest[] ?? []);
+    } catch (err) {
+      console.error('Exception fetching quotes:', err);
       toast.error('Unable to load quotes');
-      return;
     }
-
-    setQuotes(data as QuoteRequest[] ?? []);
   }, [user]);
   useEffect(() => {
     if (user) {fetchOrders();fetchReviews();fetchQuotes();}
