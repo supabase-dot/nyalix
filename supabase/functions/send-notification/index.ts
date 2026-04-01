@@ -17,14 +17,17 @@ Deno.serve(async (req) => {
   }
 
   try {
+    const authHeader = req.headers.get('Authorization') ?? undefined
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      authHeader
+        ? {
+            global: {
+              headers: { Authorization: authHeader },
+            },
+          }
+        : undefined
     )
 
     const { type, event, recipient, subject, message, orderId, userId }: NotificationRequest = await req.json()
@@ -33,7 +36,10 @@ Deno.serve(async (req) => {
     let errorMessage = ''
 
     if (type === 'email') {
-      success = await sendEmail(recipient, subject!, message)
+      if (!subject) {
+        throw new Error('Missing "subject" for email notification')
+      }
+      success = await sendEmail(recipient, subject, message)
     } else if (type === 'whatsapp') {
       success = await sendWhatsApp(recipient, message)
     }
