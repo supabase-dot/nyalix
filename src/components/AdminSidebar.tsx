@@ -1,8 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { type LucideIcon, BarChart3, Package, ShoppingBag, Award, ImageIcon, MessageSquare, Mail, Users, Settings, X, Tags, FileText } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { type LucideIcon, BarChart3, Package, ShoppingBag, Award, ImageIcon, MessageSquare, Mail, Users, Settings, X, Tags, FileText, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
 export type AdminTab = 'dashboard' | 'products' | 'categories' | 'orders' | 'certificates' | 'exhibitions' | 'messages' | 'quotes' | 'users' | 'newsletter' | 'settings';
@@ -42,6 +45,41 @@ const items: SidebarItem[] = [
   { key: 'settings', icon: Settings },
 ];
 
+// Logout button component
+const LogoutButton: React.FC<{
+  isMobile?: boolean;
+  onClose?: () => void;
+}> = ({ isMobile = false, onClose }) => {
+  const { t } = useTranslation();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    if (!confirm(t('admin.settings.logoutConfirm'))) return;
+    try {
+      await signOut();
+      toast.success('Logged out successfully');
+      navigate('/');
+      if (isMobile) onClose?.();
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout');
+    }
+  };
+
+  return (
+    <motion.button
+      onClick={handleLogout}
+      whileHover={{ x: 4 }}
+      whileTap={{ scale: 0.98 }}
+      className="w-full px-3 md:px-4 py-2.5 md:py-3 rounded-lg md:rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-600 hover:text-red-700 transition-all duration-200 flex items-center justify-center gap-2 font-medium text-sm"
+    >
+      <LogOut className="w-4 h-4" />
+      {t('admin.settings.logout')}
+    </motion.button>
+  );
+};
+
 // Sidebar content component
 const SidebarContent: React.FC<{
   sidebarItems: (SidebarItem & { badge?: number })[];
@@ -63,7 +101,7 @@ const SidebarContent: React.FC<{
     )}
 
     {/* Navigation Items */}
-    <nav className="flex-1 px-3 md:px-4 py-4 md:py-6 space-y-1 md:space-y-2 overflow-y-auto">
+    <nav className="flex-1 px-3 md:px-4 py-4 md:py-6 space-y-1 md:space-y-2 overflow-y-auto flex flex-col">
       {sidebarItems.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.key;
@@ -134,11 +172,12 @@ const SidebarContent: React.FC<{
       })}
     </nav>
 
-    {/* Footer info */}
-    <div className="px-4 py-4 border-t border-border">
+    {/* Footer info and logout */}
+    <div className="px-4 py-4 border-t border-border space-y-3">
       <p className="text-xs text-muted-foreground text-center">
         Admin Dashboard v1.0
       </p>
+      <LogoutButton isMobile={isMobile} onClose={onClose} />
     </div>
   </>
 );

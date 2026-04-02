@@ -403,6 +403,8 @@ const resources = {
           passwordPlaceholder: "••••••••",
           saving: "Saving...",
           saveChanges: "Save Changes",
+          logout: "Logout",
+          logoutConfirm: "Are you sure you want to logout?",
         },
         certificates: {
           title: "Certificates",
@@ -1044,6 +1046,8 @@ const resources = {
           passwordPlaceholder: "••••••••",
           saving: "جاري الحفظ...",
           saveChanges: "حفظ التغييرات",
+          logout: "تسجيل الخروج",
+          logoutConfirm: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
         },
         certificates: {
           title: "الشهادات",
