@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { ShoppingCart, Menu, X, Globe, ChevronDown, LogIn, LogOut, Shield, UserCircle, Search } from 'lucide-react';
 import LiveSearch from './LiveSearch';
 import { useCart } from '@/contexts/CartContext';
@@ -21,7 +22,21 @@ const Navbar = () => {
   const [langOpen, setLangOpen] = useState(false);
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const { data: categories = [] } = useCategories();
+
+  const handleLogout = async () => {
+    if (!confirm(t('admin.settings.logoutConfirm'))) return;
+    try {
+      await signOut();
+      toast.success('Logged out successfully');
+      navigate('/');
+      setMobileOpen(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to logout');
+    }
+  };
 
   const navLinks = [
     { path: '/', label: t('nav.home') },
@@ -218,10 +233,16 @@ const Navbar = () => {
                   }`}>{link.label}</Link>
               ))}
               {user && !isAdmin && (
-                <Link to="/profile" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded text-sm font-medium text-foreground/70 hover:bg-muted">My Account</Link>
+                <Link key="profile" to="/profile" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded text-sm font-medium text-foreground/70 hover:bg-muted">My Account</Link>
               )}
               {isAdmin && (
-                <Link to="/admin/dashboard" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded text-sm font-medium text-foreground/70 hover:bg-muted">Admin Dashboard</Link>
+                <Link key="admin-dashboard" to="/admin/dashboard" onClick={() => setMobileOpen(false)} className="px-4 py-2.5 rounded text-sm font-medium text-foreground/70 hover:bg-muted">Admin Dashboard</Link>
+              )}
+              {user && (
+                <button key="logout" onClick={handleLogout} className="w-full px-4 py-2.5 rounded text-sm font-medium text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2">
+                  <LogOut className="w-4 h-4" />
+                  {t('admin.settings.logout')}
+                </button>
               )}
             </div>
           </motion.div>

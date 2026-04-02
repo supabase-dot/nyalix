@@ -93,6 +93,7 @@ const ReviewModal = ({
 
 
 }: {open: boolean;orderId: string;productId: string;productName: string;userId: string;existingReview?: Review;onClose: () => void;onSaved: () => void;}) => {
+  const { t } = useTranslation();
   const [rating, setRating] = useState(existingReview?.rating || 0);
   const [text, setText] = useState(existingReview?.review_text || '');
   const [saving, setSaving] = useState(false);
