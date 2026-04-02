@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { type LucideIcon, BarChart3, Package, ShoppingBag, Award, ImageIcon, MessageSquare, Mail, Users, Settings, X, Tags, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -8,7 +10,7 @@ export type AdminTab = 'dashboard' | 'products' | 'categories' | 'orders' | 'cer
 interface SidebarItem {
   key: AdminTab;
   icon: LucideIcon;
-  label: string;
+  label?: string;
   badge?: number;
 }
 
@@ -27,17 +29,17 @@ interface AdminSidebarProps {
 }
 
 const items: SidebarItem[] = [
-  { key: 'dashboard', icon: BarChart3, label: 'Admin Dashboard' },
-  { key: 'products', icon: Package, label: 'Products' },
-  { key: 'categories', icon: Tags, label: 'Categories' },
-  { key: 'orders', icon: ShoppingBag, label: 'Orders' },
-  { key: 'certificates', icon: Award, label: 'Certificates' },
-  { key: 'exhibitions', icon: ImageIcon, label: 'Exhibitions' },
-  { key: 'messages', icon: MessageSquare, label: 'Messages' },
-  { key: 'quotes', icon: FileText, label: 'Quotes' },
-  { key: 'newsletter', icon: Mail, label: 'Newsletter' },
-  { key: 'users', icon: Users, label: 'Users' },
-  { key: 'settings', icon: Settings, label: 'Settings' },
+  { key: 'dashboard', icon: BarChart3 },
+  { key: 'products', icon: Package },
+  { key: 'categories', icon: Tags },
+  { key: 'orders', icon: ShoppingBag },
+  { key: 'certificates', icon: Award },
+  { key: 'exhibitions', icon: ImageIcon },
+  { key: 'messages', icon: MessageSquare },
+  { key: 'quotes', icon: FileText },
+  { key: 'newsletter', icon: Mail },
+  { key: 'users', icon: Users },
+  { key: 'settings', icon: Settings },
 ];
 
 // Sidebar content component
@@ -148,8 +150,12 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
   isOpen = true,
   onClose,
 }) => {
+  const { t } = useTranslation();
+  const { isRTL } = useLanguage();
+
   const sidebarItems = items.map((item) => ({
     ...item,
+    label: t(`admin.sidebar.${item.key}`),
     badge:
       item.key === 'orders'
         ? notifications.orders
@@ -174,13 +180,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 z-30 bg-black/50 lg:hidden\"
+            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
           />
         )}
       </AnimatePresence>
 
       {/* Sidebar Desktop (Always Visible) */}
-      <aside className="hidden lg:fixed lg:left-0 lg:top-16 lg:z-30 lg:h-[calc(100vh-64px)] lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-r lg:border-border lg:shadow-luxury lg:pt-16 lg:overflow-y-auto lg:flex lg:flex-col">
+      <aside
+        className={cn(
+          'hidden lg:fixed lg:top-16 lg:z-30 lg:h-[calc(100vh-64px)] lg:w-64 lg:bg-gradient-to-b lg:from-card lg:to-card/95 lg:border-border lg:shadow-luxury lg:pt-16 lg:overflow-y-auto lg:flex lg:flex-col',
+          isRTL ? 'lg:right-0 lg:left-auto lg:border-l lg:border-r-0' : 'lg:left-0 lg:right-auto lg:border-r lg:border-l-0'
+        )}
+      >
         <SidebarContent 
           sidebarItems={sidebarItems}
           activeTab={activeTab}
@@ -193,10 +204,13 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <motion.aside
         initial={false}
         animate={{
-          x: isOpen ? 0 : -280,
+          x: isOpen ? 0 : isRTL ? 280 : -280,
         }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="fixed left-0 top-14 md:top-16 z-40 h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] w-64 bg-gradient-to-b from-card to-card/95 border-r border-border shadow-luxury pt-14 md:pt-16 overflow-y-auto flex flex-col lg:hidden"
+        className={cn(
+          'fixed top-14 md:top-16 z-40 h-[calc(100vh-56px)] md:h-[calc(100vh-64px)] w-64 bg-gradient-to-b from-card to-card/95 border-border shadow-luxury pt-14 md:pt-16 overflow-y-auto flex flex-col lg:hidden',
+          isRTL ? 'right-0 border-l' : 'left-0 border-r'
+        )}
       >
         <SidebarContent 
           sidebarItems={sidebarItems}

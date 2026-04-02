@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,7 +10,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 /* ── Confirm Modal ── */
-const ConfirmModal = ({ title, message, onConfirm, onCancel }: { title: string; message: string; onConfirm: () => void; onCancel: () => void; }) => (
+const ConfirmModal = ({ title, message, onConfirm, onCancel }: { title: string; message: string; onConfirm: () => void; onCancel: () => void; }) => {
+  const { t } = useTranslation();
+  return (
   <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onCancel}>
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
@@ -24,12 +27,13 @@ const ConfirmModal = ({ title, message, onConfirm, onCancel }: { title: string; 
       </div>
       <p className="text-sm text-muted-foreground mb-6">{message}</p>
       <div className="flex gap-3">
-        <button onClick={onCancel} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">Cancel</button>
-        <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-destructive text-destructive-foreground rounded-lg text-sm font-medium hover:bg-destructive/90 transition-colors">Delete</button>
+        <button onClick={onCancel} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">{t('admin.productForm.cancel')}</button>
+        <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-destructive text-destructive-foreground rounded-lg text-sm font-medium hover:bg-destructive/90 transition-colors">{t('admin.deleteProduct')}</button>
       </div>
     </motion.div>
   </div>
 );
+};
 
 /* ── Exhibition Form Modal ── */
 const ExhibitionForm = ({
@@ -41,6 +45,7 @@ const ExhibitionForm = ({
   onClose: () => void;
   onSaved: () => void;
 }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     title: initial?.title ?? '',
     description: initial?.description ?? '',
@@ -66,7 +71,7 @@ const ExhibitionForm = ({
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.title.trim()) { toast.error('Title is required'); return; }
+    if (!form.title.trim()) { toast.error(t('admin.exhibitions.titleRequired')); return; }
     setSaving(true);
     const payload = {
       title: form.title,
@@ -83,7 +88,7 @@ const ExhibitionForm = ({
     }
     setSaving(false);
     if (error) { toast.error(error.message); return; }
-    toast.success(initial?.id ? 'Exhibition updated' : 'Exhibition created');
+    toast.success(initial?.id ? t('admin.exhibitions.updated') : t('admin.exhibitions.created'));
     onSaved();
     onClose();
   };
@@ -96,19 +101,19 @@ const ExhibitionForm = ({
         className="bg-card rounded-2xl border border-border p-6 shadow-luxury w-full max-w-lg my-4"
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-display font-bold text-foreground text-lg">{initial?.id ? 'Edit Exhibition' : 'New Exhibition'}</h3>
+          <h3 className="font-display font-bold text-foreground text-lg">{initial?.id ? t('admin.exhibitions.editExhibition') : t('admin.exhibitions.newExhibition')}</h3>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
         </div>
         <form onSubmit={save} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Title *</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">{t('admin.exhibitions.title')}</label>
             <input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm" placeholder="Exhibition title" required />
+              className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm" placeholder={t('admin.exhibitions.titlePlaceholder')} required />
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+            <label className="block text-sm font-medium text-foreground mb-1.5">{t('admin.exhibitions.description')}</label>
             <textarea value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              rows={4} className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm resize-none" placeholder="Describe the exhibition..." />
+              rows={4} className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 text-sm resize-none" placeholder={t('admin.exhibitions.descriptionPlaceholder')} />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -136,14 +141,14 @@ const ExhibitionForm = ({
             ) : (
               <button type="button" onClick={() => coverRef.current?.click()}
                 className="w-full h-24 border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors text-sm">
-                {uploading ? <span className="animate-pulse">Uploading...</span> : <><Upload className="w-5 h-5" /><span>Upload cover image</span></>}
+                {uploading ? <span className="animate-pulse">{t('admin.exhibitions.uploading')}</span> : <><Upload className="w-5 h-5" /><span>{t('admin.exhibitions.uploadCoverImage')}</span></>}
               </button>
             )}
           </div>
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">Cancel</button>
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">{t('admin.productForm.cancel')}</button>
             <button type="submit" disabled={saving} className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors">
-              {saving ? 'Saving...' : (initial?.id ? 'Update' : 'Create')}
+              {saving ? t('admin.saving') : (initial?.id ? t('admin.update') : t('admin.create'))}
             </button>
           </div>
         </form>
@@ -154,6 +159,7 @@ const ExhibitionForm = ({
 
 /* ── Media Manager ── */
 const MediaManager = ({ exhibitionId, onClose }: { exhibitionId: string; onClose: () => void }) => {
+  const { t } = useTranslation();
   const { data: exhibition, refetch } = useExhibition(exhibitionId);
   const [uploading, setUploading] = useState(false);
   const [confirm, setConfirm] = useState<{ id: string } | null>(null);
@@ -193,8 +199,8 @@ const MediaManager = ({ exhibitionId, onClose }: { exhibitionId: string; onClose
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4 overflow-y-auto" onClick={onClose}>
       {confirm && (
         <ConfirmModal
-          title="Delete Media"
-          message="Are you sure you want to delete this media file?"
+          title={t('admin.exhibitions.deleteMediaTitle')}
+          message={t('admin.exhibitions.deleteMediaConfirm')}
           onConfirm={() => deleteMedia(confirm.id)}
           onCancel={() => setConfirm(null)}
         />
@@ -205,7 +211,7 @@ const MediaManager = ({ exhibitionId, onClose }: { exhibitionId: string; onClose
         className="bg-card rounded-2xl border border-border p-6 shadow-luxury w-full max-w-3xl my-4"
       >
         <div className="flex items-center justify-between mb-5">
-          <h3 className="font-display font-bold text-foreground text-lg">Manage Media — {exhibition?.title}</h3>
+          <h3 className="font-display font-bold text-foreground text-lg">{t('admin.exhibitions.manageMedia')} — {exhibition?.title}</h3>
           <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground transition-colors"><X className="w-5 h-5" /></button>
         </div>
 
@@ -215,20 +221,20 @@ const MediaManager = ({ exhibitionId, onClose }: { exhibitionId: string; onClose
           <input ref={videoRef} type="file" accept="video/*" multiple onChange={(e) => e.target.files && uploadFiles(e.target.files, 'video')} className="hidden" />
           <button onClick={() => imageRef.current?.click()} disabled={uploading}
             className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-60 transition-colors">
-            <ImageIcon className="w-4 h-4" /> Add Images
+            <ImageIcon className="w-4 h-4" /> {t('admin.exhibitions.addImages')}
           </button>
           <button onClick={() => videoRef.current?.click()} disabled={uploading}
             className="flex items-center gap-2 px-4 py-2.5 bg-muted text-foreground border border-border rounded-lg text-sm font-medium hover:bg-border disabled:opacity-60 transition-colors">
-            <Play className="w-4 h-4" /> Add Videos
+            <Play className="w-4 h-4" /> {t('admin.exhibitions.addVideos')}
           </button>
-          {uploading && <span className="text-sm text-muted-foreground self-center animate-pulse">Uploading...</span>}
+          {uploading && <span className="text-sm text-muted-foreground self-center animate-pulse">{t('admin.exhibitions.uploading')}</span>}
         </div>
 
         {/* Media grid */}
         {media.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground border-2 border-dashed border-border rounded-xl">
             <Upload className="w-10 h-10 mx-auto mb-3 opacity-40" />
-            <p>No media uploaded yet</p>
+            <p>{t('admin.exhibitions.noMedia')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">

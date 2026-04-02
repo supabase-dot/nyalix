@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays, subMonths, startOfDay } from 'date-fns';
 import * as Recharts from 'recharts';
@@ -51,12 +52,12 @@ interface Product {
 
 type Range = 'today' | '7d' | '30d' | '12m' | 'custom';
 
-const RANGE_OPTIONS: { label: string; value: Range }[] = [
-  { label: 'Today', value: 'today' },
-  { label: 'Last 7 Days', value: '7d' },
-  { label: 'Last 30 Days', value: '30d' },
-  { label: 'Last 12 Months', value: '12m' },
-  { label: 'Custom', value: 'custom' },
+const RANGE_OPTIONS: { labelKey: string; value: Range }[] = [
+  { labelKey: 'admin.analytics.range.today', value: 'today' },
+  { labelKey: 'admin.analytics.range.7d', value: '7d' },
+  { labelKey: 'admin.analytics.range.30d', value: '30d' },
+  { labelKey: 'admin.analytics.range.12m', value: '12m' },
+  { labelKey: 'admin.analytics.range.custom', value: 'custom' },
 ];
 
 interface Props {
@@ -66,6 +67,7 @@ interface Props {
 }
 
 const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
+  const { t } = useTranslation();
   const [range, setRange] = useState<Range>('30d');
   const [customStart, setCustomStart] = useState<string>('');
   const [customEnd, setCustomEnd] = useState<string>('');
@@ -373,7 +375,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
                 : 'bg-card text-foreground hover:bg-muted'
             }`}
           >
-            {opt.label}
+            {t(opt.labelKey)}
           </button>
         ))}
         {range === 'custom' && (
@@ -384,7 +386,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
               onChange={(e) => setCustomStart(e.target.value)}
               className="px-2 py-1 rounded-lg border border-border"
             />
-            <span className="text-sm">to</span>
+            <span className="text-sm">{t('admin.analytics.to')}</span>
             <input
               type="date"
               value={customEnd}
@@ -399,32 +401,32 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           {
-            label: 'Total Users',
+            label: t('admin.analytics.totalUsers'),
             value: overviewMetrics.totalUsers,
             icon: Users,
           },
           {
-            label: 'New Users',
+            label: t('admin.analytics.newUsers'),
             value: overviewMetrics.newUsers,
             icon: Users,
           },
           {
-            label: 'Total Orders',
+            label: t('admin.analytics.totalOrders'),
             value: overviewMetrics.totalOrders,
             icon: ShoppingBag,
           },
           {
-            label: 'Revenue',
+            label: t('admin.analytics.revenue'),
             value: `$${overviewMetrics.revenue.toLocaleString()}`,
             icon: DollarSign,
           },
           {
-            label: 'Pending Orders',
+            label: t('admin.analytics.pendingOrders'),
             value: overviewMetrics.pending,
             icon: Clock,
           },
           {
-            label: 'Completed Orders',
+            label: t('admin.analytics.completedOrders'),
             value: overviewMetrics.completed,
             icon: Package,
           },
@@ -448,11 +450,11 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
 
       {/* sales charts */}
       <div className="space-y-6">
-        <h3 className="font-display font-semibold text-foreground">Sales Analytics</h3>
+        <h3 className="font-display font-semibold text-foreground">{t('admin.analytics.salesAnalytics')}</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
             <ChartContainer
-              config={{ revenue: { label: 'Revenue', color: '#10b981' } }}
+              config={{ revenue: { label: t('admin.analytics.revenue'), color: '#10b981' } }}
             >
               <Recharts.LineChart data={salesByDate}>
                 <Recharts.XAxis dataKey="date" />

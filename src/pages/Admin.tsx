@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, Navigate } from 'react-router-dom';
+import i18n from '@/lib/i18n';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -34,8 +36,8 @@ class AdminErrorBoundary extends React.Component<{ children: React.ReactNode }, 
       return (
         <div className="pt-28 lg:pt-24 min-h-screen bg-background flex items-center justify-center">
           <div className="bg-card rounded-xl border border-border p-8 shadow-luxury max-w-lg">
-            <h1 className="text-xl font-bold text-foreground mb-4">Something went wrong</h1>
-            <p className="text-sm text-muted-foreground mb-4">The admin dashboard failed to render.</p>
+            <h1 className="text-xl font-bold text-foreground mb-4">{i18n.t('admin.errorBoundary.title')}</h1>
+            <p className="text-sm text-muted-foreground mb-4">{i18n.t('admin.errorBoundary.message')}</p>
             <pre className="text-xs text-red-500 bg-muted p-3 rounded-lg overflow-x-auto">{this.state.error.message}</pre>
           </div>
         </div>
@@ -92,6 +94,7 @@ interface Certificate { id: string; title: string; title_ar: string; type: strin
 const ConfirmModal = ({ open, title, message, onConfirm, onCancel
 
 }: {open: boolean;title: string;message: string;onConfirm: () => void;onCancel: () => void;}) => {
+  const { t } = useTranslation();
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onCancel}>
@@ -108,8 +111,8 @@ const ConfirmModal = ({ open, title, message, onConfirm, onCancel
         </div>
         <p className="text-sm text-muted-foreground mb-6">{message}</p>
         <div className="flex gap-3">
-          <button onClick={onCancel} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">Cancel</button>
-          <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-destructive text-destructive-foreground rounded-lg text-sm font-medium hover:bg-destructive/90 transition-colors">Delete</button>
+          <button onClick={onCancel} className="flex-1 px-4 py-2.5 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors">{t('admin.productForm.cancel')}</button>
+          <button onClick={onConfirm} className="flex-1 px-4 py-2.5 bg-destructive text-destructive-foreground rounded-lg text-sm font-medium hover:bg-destructive/90 transition-colors">{t('admin.deleteProduct')}</button>
         </div>
       </motion.div>
     </div>);
@@ -121,6 +124,7 @@ interface UserProfile {id: string;user_id: string;full_name: string;email: strin
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const { t } = useTranslation();
+  const { language, setLanguage, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [tab, setTab] = useState<AdminTab>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -232,30 +236,30 @@ const Admin = () => {
     const ordersChannel = supabase.channel('admin-orders-toast').
     on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, (payload) => {
       setOrders((prev) => [payload.new as Order, ...prev]);
-      toast.info('🛒 New order received!');
+      toast.info(t('admin.toast.newOrder'));
     }).subscribe();
 
     const messagesChannel = supabase.channel('admin-messages-toast').
     on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'contact_messages' }, (payload) => {
       setMessages((prev) => [payload.new as ContactMsg, ...prev]);
-      toast.info('💬 New message received!');
+      toast.info(t('admin.toast.newMessage'));
     }).subscribe();
 
     const usersChannel = supabase.channel('admin-users-toast').
     on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'profiles' }, (payload) => {
       setUsers((prev) => [payload.new as UserProfile, ...prev]);
-      toast.info('👤 New user registered!');
+      toast.info(t('admin.toast.newUser'));
     }).subscribe();
 
     const newsletterChannel = supabase.channel('admin-newsletter-toast').
     on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'newsletter_subscribers' }, () => {
-      toast.info('📧 New newsletter subscriber!');
+      toast.info(t('admin.toast.newSubscriber'));
     }).subscribe();
 
     const productsChannel = supabase.channel('admin-products').
     on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'products' }, (payload) => {
       setProducts((prev) => [payload.new as Product, ...prev]);
-      toast.info('✨ New product added!');
+      toast.info(t('admin.toast.newProduct'));
     }).
     on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'products' }, (payload) => {
       setProducts((prev) =>
@@ -293,11 +297,11 @@ const Admin = () => {
     if (editProduct.id) {
       const { error } = await supabase.from('products').update(payload).eq('id', editProduct.id);
       if (error) {toast.error(error.message);return;}
-      toast.success('Product updated');
+      toast.success(t('admin.toast.productUpdated'));
     } else {
       const { error } = await supabase.from('products').insert(payload);
       if (error) {toast.error(error.message);return;}
-      toast.success('Product added');
+      toast.success(t('admin.toast.productAdded'));
     }
     setShowForm(false);
     setEditProduct(null);
@@ -305,9 +309,9 @@ const Admin = () => {
   };
 
   const deleteProduct = async (id: string) => {
-    if (!confirm('Delete this product?')) return;
+    if (!confirm(t('admin.toast.deleteProductConfirm') || '')) return;
     await supabase.from('products').delete().eq('id', id);
-    toast.success('Product deleted');
+    toast.success(t('admin.toast.productDeleted'));
     fetchProducts();
   };
 
@@ -315,7 +319,7 @@ const Admin = () => {
   const saveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editCategory?.name || !editCategory?.name_ar) {
-      toast.error('Please fill in both language fields');
+      toast.error(t('admin.toast.fillBothLanguageFields'));
       return;
     }
 
@@ -350,7 +354,7 @@ const Admin = () => {
           .sort((a, b) => a.order_index - b.order_index)
       );
       
-      toast.success('Category updated');
+      toast.success(t('admin.toast.categoryUpdated'));
     } else {
       // Add new category
       const { data, error } = await supabase
@@ -371,7 +375,7 @@ const Admin = () => {
         );
       }
       
-      toast.success('Category added');
+      toast.success(t('admin.toast.categoryAdded'));
     }
 
     setShowCategoryForm(false);
@@ -380,7 +384,7 @@ const Admin = () => {
   };
 
   const deleteCategory = async (id: string) => {
-    if (!confirm('Delete this category? Products using it will be unaffected.')) return;
+    if (!confirm(t('admin.toast.deleteCategoryConfirm'))) return;
     const { error } = await supabase
       .from('categories')
       .delete()
@@ -393,7 +397,7 @@ const Admin = () => {
     // Immediately update local state for instant UI feedback
     setCategoriesList((prev) => prev.filter((cat) => cat.id !== id));
     
-    toast.success('Category deleted');
+    toast.success(t('admin.toast.categoryDeleted'));
     // The hook will automatically update via real-time subscription for other components
   };
 
@@ -402,20 +406,20 @@ const Admin = () => {
     if (!order) return;
 
     await supabase.from('orders').update({ status }).eq('id', id);
-    toast.success('Order status updated');
+    toast.success(t('admin.toast.statusUpdated'));
     fetchOrders();
 
     // Send status update notifications
     await generateAndSendNotifications('order_status_update', order.user_id, id);
     
     // Show additional notification about email being sent
-    toast.success('Status update email sent to customer');
+    toast.success(t('admin.toast.statusEmail'))
   };
 
   const deleteOrder = async (id: string) => {
-    if (!confirm('Delete this order?')) return;
+    if (!confirm(t('admin.toast.deleteOrderConfirm') || '')) return;
     await supabase.from('orders').delete().eq('id', id);
-    toast.success('Order deleted');
+    toast.success(t('admin.toast.orderDeleted'));
     fetchOrders();
   };
 
@@ -428,36 +432,36 @@ const Admin = () => {
       });
 
       if (error || !data?.success) {
-        toast.error('Unable to grant admin access. Please try again or contact support.');
+        toast.error(t('admin.toast.adminAccessError'));
         return;
       }
 
-      toast.success('User is now an admin!');
+      toast.success(t('admin.toast.adminAccessSuccess'));
       // Refresh the page to update the admin status
       window.location.reload();
     } catch (error) {
-      toast.error('Failed to make user admin');
+      toast.error(t('admin.toast.adminAccessFailed'));
     }
   };
 
   const deleteMessage = (msgId: string) => {
     setConfirmModal({
       open: true,
-      title: 'Delete Message',
-      message: 'Are you sure you want to delete this message? This action cannot be undone.',
+      title: t('admin.toast.deleteMessageTitle'),
+      message: t('admin.toast.deleteMessageConfirm'),
       onConfirm: async () => {
         await supabase.from('contact_messages').delete().eq('id', msgId);
         setMessages((prev) => prev.filter((m) => m.id !== msgId));
-        toast.success('Message deleted');
+        toast.success(t('admin.toast.messageDeleted'));
         setConfirmModal(null);
       }
     });
   };
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Delete this user profile?')) return;
+    if (!confirm(t('admin.toast.deleteUserProfileConfirm') || '')) return;
     await supabase.from('profiles').delete().eq('user_id', userId);
-    toast.success('User deleted');
+    toast.success(t('admin.toast.userDeleted'));
     fetchUsers();
   };
 
@@ -479,7 +483,7 @@ const Admin = () => {
     <div className="pt-28 lg:pt-24 min-h-screen bg-background flex items-center justify-center">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>
-        <p className="text-muted-foreground">Loading admin dashboard...</p>
+        <p className="text-muted-foreground">{t('admin.loading')}</p>
       </div>
     </div>
   );
@@ -553,7 +557,15 @@ const Admin = () => {
               >
                 <Menu className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" />
               </button>
-              <h1 className="text-xl md:text-2xl font-display font-bold text-primary-foreground truncate">Admin Dashboard</h1>
+              <h1 className="text-xl md:text-2xl font-display font-bold text-primary-foreground truncate">{t('admin.title')}</h1>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                className="px-3 py-1 rounded-lg border border-white/30 text-white text-xs font-semibold hover:bg-white/10 transition-colors"
+              >
+                {language === 'en' ? 'العربية' : 'English'}
+              </button>
             </div>
             {/* Include newsletter in the global notification summary as well */}
             {notificationCounts.orders + notificationCounts.messages + notificationCounts.users + notificationCounts.newsletter + notificationCounts.quotes > 0 &&
@@ -566,7 +578,7 @@ const Admin = () => {
         </div>
 
         {/* Main content area — Properly spaced below fixed navbar */}
-        <main className="pt-14 md:pt-16 lg:ml-64 transition-all duration-300">
+        <main className={`pt-14 md:pt-16 transition-all duration-300 ${isRTL ? 'lg:mr-64' : 'lg:ml-64'}`}>
           <div className="container mx-auto px-4 py-6 max-w-7xl">
 
         {/* Dashboard */}
@@ -574,14 +586,14 @@ const Admin = () => {
         <div className="space-y-8">
             {/* Product Analytics Summary */}
             <div className="space-y-4">
-              <h3 className="font-display font-semibold text-foreground">Product Analytics Summary</h3>
+              <h3 className="font-display font-semibold text-foreground">{t('admin.analytics.title')}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[{
-                  label: 'Total Products',
+                  label: t('admin.analytics.totalProducts'),
                   value: products.length,
                   icon: Package,
                 }, {
-                  label: 'New This Month',
+                  label: t('admin.analytics.newThisMonth'),
                   value: products.filter(p => {
                     const created = new Date(p.created_at);
                     const now = new Date();
@@ -589,11 +601,11 @@ const Admin = () => {
                   }).length,
                   icon: Package,
                 }, {
-                  label: 'Low Stock (≤5)',
+                  label: t('admin.analytics.lowStock'),
                   value: products.filter(p => p.stock_quantity <= 5).length,
                   icon: AlertTriangle,
                 }, {
-                  label: 'Featured',
+                  label: t('admin.analytics.featured'),
                   value: products.filter(p => p.featured).length,
                   icon: Award,
                 }].map((s, i) =>
@@ -619,13 +631,13 @@ const Admin = () => {
             {/* Admin Setup */}
             {!isAdmin && (
               <div className="bg-card rounded-xl border border-border p-6 shadow-luxury">
-                <h3 className="font-display font-semibold text-foreground mb-4">Admin Setup</h3>
-                <p className="text-muted-foreground mb-4">You need admin privileges to access all features. Click the button below to make yourself an admin.</p>
+                <h3 className="font-display font-semibold text-foreground mb-4">{t('admin.setup.title')}</h3>
+                <p className="text-muted-foreground mb-4">{t('admin.setup.description')}</p>
                 <button
                   onClick={makeCurrentUserAdmin}
                   className="px-4 py-2 bg-gradient-gold text-primary-foreground rounded-lg font-semibold hover:opacity-90 transition-opacity"
                 >
-                  Make Me Admin
+                  {t('admin.setup.action')}
                 </button>
               </div>
             )}
@@ -633,7 +645,7 @@ const Admin = () => {
             {/* Recent activity */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-card rounded-xl border border-border p-5 shadow-luxury">
-                <h3 className="font-display font-semibold text-foreground mb-4">Recent Orders</h3>
+                <h3 className="font-display font-semibold text-foreground mb-4">{t('admin.recentOrders')}</h3>
                 <div className="space-y-3">
                   {orders.slice(0, 5).map((o) =>
                 <div key={o.id} className="flex items-center gap-3 text-sm">
@@ -645,7 +657,7 @@ const Admin = () => {
                         </div>
                   }
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground truncate">{o.shipping_name || 'Unknown'}</p>
+                        <p className="font-medium text-foreground truncate">{o.shipping_name || t('admin.unknown')}</p>
                         <p className="text-xs text-muted-foreground">${Number(o.total).toLocaleString()}</p>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium shrink-0 ${
@@ -654,7 +666,7 @@ const Admin = () => {
                   o.status === 'processing' ? 'bg-yellow-100 text-yellow-700' :
                   o.status === 'cancelled' ? 'bg-red-100 text-red-700' :
                   'bg-muted text-muted-foreground'}`
-                  }>{o.status}</span>
+                  }>{t(`order.status.${o.status.toLowerCase()}`) || o.status}</span>
                       <button onClick={() => deleteOrder(o.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors shrink-0">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -664,7 +676,7 @@ const Admin = () => {
                 </div>
               </div>
               <div className="bg-card rounded-xl border border-border p-5 shadow-luxury">
-                <h3 className="font-display font-semibold text-foreground mb-4">Recent Messages</h3>
+                <h3 className="font-display font-semibold text-foreground mb-4">{t('admin.recentMessages')}</h3>
                 <div className="space-y-3">
                   {messages.slice(0, 5).map((m) =>
                 <div key={m.id} className="flex items-start gap-3 text-sm">
@@ -678,7 +690,7 @@ const Admin = () => {
                       </button>
                     </div>
                 )}
-                  {messages.length === 0 && <p className="text-muted-foreground text-sm">No messages yet.</p>}
+                  {messages.length === 0 && <p className="text-muted-foreground text-sm">{t('admin.noMessages')}</p>}
                 </div>
               </div>
             </div>
@@ -689,12 +701,12 @@ const Admin = () => {
         {tab === 'products' &&
         <div>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-lg font-display font-semibold text-foreground">Manage Products</h2>
+              <h2 className="text-lg font-display font-semibold text-foreground">{t('admin.manageProducts')}</h2>
               <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search products..."
+                    placeholder={t('products.search')}
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     className="w-full sm:w-64 px-4 py-2 pl-10 pr-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -717,7 +729,7 @@ const Admin = () => {
                 </div>
                 <button onClick={() => {setEditProduct({ stock_quantity: 0 });setShowForm(true);}}
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 whitespace-nowrap">
-                  <Plus className="w-4 h-4" /> Add Product
+                  <Plus className="w-4 h-4" /> {t('admin.addProduct')}
                 </button>
               </div>
             </div>
@@ -726,15 +738,15 @@ const Admin = () => {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
                 <div className="bg-card rounded-xl border border-border p-6 shadow-luxury max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-display font-semibold text-foreground">{editProduct?.id ? 'Edit' : 'Add'} Product</h3>
+                    <h3 className="font-display font-semibold text-foreground">{editProduct?.id ? t('admin.editProduct') : t('admin.addProduct')}</h3>
                     <button onClick={() => {setShowForm(false);setEditProduct(null);}}><X className="w-5 h-5 text-muted-foreground" /></button>
                   </div>
                   <form onSubmit={saveProduct} className="space-y-4">
                     {[
-                { key: 'name', label: 'Name (EN)', type: 'text' },
-                { key: 'name_ar', label: 'Name (AR)', type: 'text' },
-                { key: 'price', label: 'Price ($)', type: 'number' },
-                { key: 'stock_quantity', label: 'Stock Quantity (units available)', type: 'number' }].
+                { key: 'name', label: t('admin.productForm.nameEn'), type: 'text' },
+                { key: 'name_ar', label: t('admin.productForm.nameAr'), type: 'text' },
+                { key: 'price', label: t('admin.productForm.price'), type: 'number' },
+                { key: 'stock_quantity', label: t('admin.productForm.stock'), type: 'number' }].
                 map((f) =>
                 <div key={f.key}>
                         <label className="block text-sm font-medium text-foreground mb-1">{f.label}</label>
@@ -747,7 +759,7 @@ const Admin = () => {
 
                     {/* Dynamic Category Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Category (EN)</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">{t('admin.productForm.categoryEn')}</label>
                       <select
                         required
                         value={editProduct?.category ?? ''}
@@ -772,7 +784,7 @@ const Admin = () => {
 
                     {/* Arabic Category - Auto-populated from database */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Category (AR)</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">{t('admin.productForm.categoryAr')}</label>
                       <input
                         type="text"
                         disabled
@@ -782,19 +794,19 @@ const Admin = () => {
                       <p className="text-xs text-muted-foreground mt-1">Automatically populated from database</p>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Description (EN)</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">{t('admin.productForm.descriptionEn')}</label>
                       <textarea rows={3} value={editProduct?.description ?? ''} onChange={(e) => setEditProduct((prev) => ({ ...prev, description: e.target.value }))}
                   className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Description (AR)</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">{t('admin.productForm.descriptionAr')}</label>
                       <textarea rows={3} value={editProduct?.description_ar ?? ''} onChange={(e) => setEditProduct((prev) => ({ ...prev, description_ar: e.target.value }))}
                   className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none" />
                     </div>
 
                     {/* Images */}
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">Images</label>
+                      <label className="block text-sm font-medium text-foreground mb-1">{t('admin.productForm.images')}</label>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {(editProduct?.images || []).map((url, i) =>
                     <div key={i} className="relative w-20 h-20">
@@ -805,7 +817,7 @@ const Admin = () => {
                     )}
                       </div>
                       <label className="flex items-center gap-2 px-4 py-2 bg-muted rounded-lg text-sm cursor-pointer hover:bg-border transition-colors">
-                        <Upload className="w-4 h-4" /> Upload Images
+                        <Upload className="w-4 h-4" /> {t('admin.productForm.uploadImages')}
                         <input type="file" multiple accept="image/*" onChange={handleImageUpload} className="hidden" />
                       </label>
                     </div>
@@ -813,7 +825,7 @@ const Admin = () => {
                     {/* Specifications */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="block text-sm font-medium text-foreground">Specifications</label>
+                        <label className="block text-sm font-medium text-foreground">{t('admin.productForm.specifications')}</label>
                         <button
                           type="button"
                           onClick={() => {
@@ -823,14 +835,14 @@ const Admin = () => {
                           }}
                           className="text-xs text-accent hover:underline flex items-center gap-1"
                         >
-                          <Plus className="w-3 h-3" />Add Row
+                          <Plus className="w-3 h-3" />{t('admin.productForm.addRow')}
                         </button>
                       </div>
                       <div className="space-y-2">
                         {(editProduct?.specifications || []).map((spec, idx) => (
                           <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-end">
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">Specification Name (EN)</label>
+                              <label className="block text-xs font-medium text-foreground mb-1">{t('admin.productForm.specNameEn')}</label>
                               <input
                                 value={spec.name_en}
                                 onChange={(e) => {
@@ -842,7 +854,7 @@ const Admin = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">Specification Name (AR)</label>
+                              <label className="block text-xs font-medium text-foreground mb-1">{t('admin.productForm.specNameAr')}</label>
                               <input
                                 value={spec.name_ar}
                                 onChange={(e) => {
@@ -854,7 +866,7 @@ const Admin = () => {
                               />
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-foreground mb-1">Value (EN)</label>
+                              <label className="block text-xs font-medium text-foreground mb-1">{t('admin.productForm.specValueEn')}</label>
                               <input
                                 value={spec.value_en}
                                 onChange={(e) => {
@@ -867,7 +879,7 @@ const Admin = () => {
                             </div>
                             <div className="flex items-end gap-2">
                               <div className="flex-1">
-                                <label className="block text-xs font-medium text-foreground mb-1">Value (AR)</label>
+                                <label className="block text-xs font-medium text-foreground mb-1">{t('admin.productForm.specValueAr')}</label>
                                 <input
                                   value={spec.value_ar}
                                   onChange={(e) => {
@@ -898,7 +910,7 @@ const Admin = () => {
                     <div className="flex items-center gap-4">
                       <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={editProduct?.in_stock ?? true} onChange={(e) => setEditProduct((prev) => ({ ...prev, in_stock: e.target.checked }))} />
-                        In Stock
+                        {t('admin.stockStatus.inStock')}
                       </label>
                       <label className="flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={editProduct?.featured ?? false} onChange={(e) => setEditProduct((prev) => ({ ...prev, featured: e.target.checked }))} />
@@ -907,7 +919,7 @@ const Admin = () => {
                     </div>
 
                     <button type="submit" className="w-full px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-white hover:opacity-90 transition-all shadow-gold">
-                      {editProduct?.id ? 'Update' : 'Create'} Product
+                      {editProduct?.id ? t('admin.update') : t('admin.create')} {t('admin.addProduct')}
                     </button>
                   </form>
                 </div>
@@ -935,7 +947,7 @@ const Admin = () => {
                     <div className="text-center py-12 bg-card rounded-xl border border-border">
                       <Package className="w-12 h-12 text-muted-foreground mx-auto opacity-50 mb-3" />
                       <p className="text-muted-foreground">
-                        {productSearch.trim() ? 'No products match your search.' : 'No products yet. Create your first one!'}
+                        {productSearch.trim() ? t('admin.noProductsMatch') : t('admin.noProductsYet')}
                       </p>
                     </div>
                   ) : (
@@ -951,7 +963,7 @@ const Admin = () => {
                     <p className={`text-sm font-bold ${p.stock_quantity <= 5 ? 'text-red-500' : 'text-green-600'}`}>{p.stock_quantity ?? 0}</p>
                   </div>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${p.in_stock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {p.in_stock ? 'In Stock' : 'Out of Stock'}
+                    {p.in_stock ? t('admin.stockStatus.inStock') : t('admin.stockStatus.outOfStock')}
                   </span>
                   <div className="flex gap-1">
                     <button onClick={() => {setEditProduct({ ...p, specifications: normalizeSpecs(p.specifications) });setShowForm(true);}} className="p-2 text-muted-foreground hover:text-foreground"><Pencil className="w-4 h-4" /></button>
@@ -970,12 +982,12 @@ const Admin = () => {
         {tab === 'categories' &&
         <div>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h2 className="text-lg font-display font-semibold text-foreground">Manage Categories</h2>
+            <h2 className="text-lg font-display font-semibold text-foreground">{t('admin.manageCategories')}</h2>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Search categories..."
+                  placeholder={t('admin.searchCategoriesPlaceholder')}
                   value={categorySearch}
                   onChange={(e) => setCategorySearch(e.target.value)}
                   className="w-full sm:w-64 px-4 py-2 pl-10 pr-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -1003,7 +1015,7 @@ const Admin = () => {
                 }}
                 className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 whitespace-nowrap"
               >
-                <Plus className="w-4 h-4" /> Add Category
+                <Plus className="w-4 h-4" /> {t('admin.addCategory')}
               </button>
             </div>
           </div>
@@ -1018,7 +1030,7 @@ const Admin = () => {
               <div className="bg-card rounded-xl border border-border p-6 shadow-luxury max-w-lg w-full">
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="font-display font-semibold text-foreground">
-                    {editCategory?.id ? 'Edit Category' : 'Add Category'}
+                    {editCategory?.id ? t('admin.editCategory') : t('admin.addCategory')}
                   </h3>
                   <button
                     onClick={() => {
@@ -1032,7 +1044,7 @@ const Admin = () => {
                 <form onSubmit={saveCategory} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Category Name (English) <span className="text-red-500">*</span>
+                      {t('admin.categoryNameEn')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -1041,14 +1053,14 @@ const Admin = () => {
                       onChange={(e) =>
                         setEditCategory((prev) => ({ ...prev, name: e.target.value }))
                       }
-                      placeholder="e.g., Diagnostic"
+                      placeholder={t('admin.categoryNameEn')}
                       className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Category Name (Arabic) <span className="text-red-500">*</span>
+                      {t('admin.categoryNameAr')} <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -1065,7 +1077,7 @@ const Admin = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Description (English)
+                      {t('admin.categoryDescriptionOptional')}
                     </label>
                     <textarea
                       rows={2}
@@ -1076,14 +1088,14 @@ const Admin = () => {
                           description: e.target.value,
                         }))
                       }
-                      placeholder="Optional description"
+                      placeholder={t('admin.categoryDescriptionOptional')}
                       className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Description (Arabic)
+                      {t('admin.categoryDescriptionOptional')}
                     </label>
                     <textarea
                       rows={2}
@@ -1102,7 +1114,7 @@ const Admin = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Display Order
+                      {t('admin.displayOrder')}
                     </label>
                     <input
                       type="number"
@@ -1122,7 +1134,7 @@ const Admin = () => {
                     type="submit"
                     className="w-full px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-white hover:opacity-90 transition-all shadow-gold"
                   >
-                    {editCategory?.id ? 'Update' : 'Create'} Category
+                    {editCategory?.id ? t('admin.update') : t('admin.create')} {t('admin.addCategory')}
                   </button>
                 </form>
               </div>
@@ -1136,19 +1148,19 @@ const Admin = () => {
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
                     <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                      Name (EN)
+                      {t('admin.categoryNameEn')}
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                      Name (AR)
+                      {t('admin.categoryNameAr')}
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                      Description
+                      {t('admin.categoryDescriptionOptional')}
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                      Order
+                      {t('admin.displayOrder')}
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-foreground">
-                      Actions
+                      {t('admin.actions') || 'Actions'}
                     </th>
                   </tr>
                 </thead>
@@ -1171,7 +1183,7 @@ const Admin = () => {
                           colSpan={5}
                           className="px-6 py-8 text-center text-muted-foreground text-sm"
                         >
-                          {categorySearch.trim() ? 'No categories match your search.' : 'No categories yet. Create your first one!'}
+                          {categorySearch.trim() ? t('admin.noCategoriesMatch') : t('admin.noCategoriesYet')}
                         </td>
                       </tr>
                     ) : (
@@ -1226,7 +1238,7 @@ const Admin = () => {
         {tab === 'orders' &&
         <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-lg font-display font-semibold text-foreground">Orders</h2>
+              <h2 className="text-lg font-display font-semibold text-foreground">{t('admin.ordersTitle')}</h2>
               <div className="relative w-full sm:w-auto">
                 <input
                   type="text"
@@ -1289,19 +1301,19 @@ const Admin = () => {
           <div key={o.id} className="bg-card rounded-xl border border-border p-5 shadow-luxury">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                   <div>
-                    <p className="text-sm text-muted-foreground">Order ID</p>
+                    <p className="text-sm text-muted-foreground">{t('admin.orderId')}</p>
                     <p className="font-mono text-sm text-foreground">{o.id.slice(0, 8)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Customer</p>
+                    <p className="text-sm text-muted-foreground">{t('admin.customer')}</p>
                     <p className="text-sm text-foreground">{o.shipping_name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total</p>
+                    <p className="text-sm text-muted-foreground">{t('admin.total')}</p>
                     <p className="font-bold text-foreground">${Number(o.total).toLocaleString()}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Date</p>
+                    <p className="text-sm text-muted-foreground">{t('admin.date')}</p>
                     <p className="text-sm text-foreground">{new Date(o.created_at).toLocaleDateString()}</p>
                   </div>
                   <select value={o.status} onChange={(e) => updateOrderStatus(o.id, e.target.value)}
@@ -1312,7 +1324,7 @@ const Admin = () => {
                     <option value="delivered">{t('order.status.delivered')}</option>
                     <option value="cancelled">{t('order.status.cancelled')}</option>
                   </select>
-                  <button onClick={() => deleteOrder(o.id)} className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete order">
+                  <button onClick={() => deleteOrder(o.id)} className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title={t('admin.deleteOrderTitle')}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                   <button
@@ -1325,7 +1337,7 @@ const Admin = () => {
                       });
                     }}
                     className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
-                    title="Toggle customer details"
+                    title={t('admin.toggleCustomerDetails')}
                   >
                     {expandedOrders.has(o.id) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -1373,7 +1385,7 @@ const Admin = () => {
         {/* Messages */}
         {tab === 'messages' && (
           <div className="space-y-4">
-            <h2 className="text-lg font-display font-semibold text-foreground mb-4">Contact Messages</h2>
+            <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('admin.messagesTitle')}</h2>
             {messages.length === 0 && <p className="text-muted-foreground">No messages yet.</p>}
             {messages.map((m) => (
               <div key={m.id} className={`bg-card rounded-xl border border-border p-5 shadow-luxury ${!m.read ? 'border-l-4 border-l-accent' : ''}`}>
@@ -1414,9 +1426,9 @@ const Admin = () => {
         {tab === 'users' &&
         <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-display font-semibold text-foreground">Registered Users ({regularUsers.length})</h2>
+              <h2 className="text-lg font-display font-semibold text-foreground">{t('admin.usersTitle')} ({regularUsers.length})</h2>
             </div>
-            {regularUsers.length === 0 && <p className="text-muted-foreground">No users yet.</p>}
+            {regularUsers.length === 0 && <p className="text-muted-foreground">{t('admin.noUsersYet')}</p>}
             <div className="grid gap-4">
               {regularUsers.map((u) =>
             <div key={u.id} className="flex flex-wrap items-center gap-4 bg-card rounded-xl border border-border p-5 shadow-luxury">
@@ -1424,12 +1436,12 @@ const Admin = () => {
                     {(u.full_name || u.email || '?')[0].toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-foreground">{u.full_name || 'No name'}</p>
+                    <p className="font-semibold text-foreground">{u.full_name || t('admin.noName')}</p>
                     <p className="text-sm text-muted-foreground">{u.email}</p>
                     <div className="flex gap-3 mt-1 text-xs text-muted-foreground">
                       {u.phone && <span>📞 {u.phone}</span>}
                       {u.country && <span>🌍 {u.country}</span>}
-                      <span>Joined: {new Date(u.created_at).toLocaleDateString()}</span>
+                      <span>{t('admin.joined')}: {new Date(u.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
                   <button onClick={() => deleteUser(u.user_id)} className="p-2 text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-lg transition-colors">
@@ -1456,6 +1468,7 @@ const Admin = () => {
 
 /* ─── Enhanced Newsletter Tab ─── */
 const NewsletterTab = () => {
+  const { t } = useTranslation();
   const { markNewsletterAsRead } = useAdminNotifications();
   const [subscribers, setSubscribers] = useState<{id: string;email: string;created_at: string;read: boolean;}[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1537,7 +1550,7 @@ const NewsletterTab = () => {
   };
 
   const exportCSV = () => {
-    const csv = ['Email,Subscribed At,Status', ...filteredSubscribers.map((s) => `${s.email},${new Date(s.created_at).toLocaleDateString()},${s.read ? 'Read' : 'Unread'}`)].join('\n');
+    const csv = ['Email,Subscribed At,Status', ...filteredSubscribers.map((s) => `${s.email},${new Date(s.created_at).toLocaleDateString()},${s.read ? t('admin.newsletter.stats.read') : t('admin.newsletter.stats.unread')}`)].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1555,10 +1568,10 @@ const NewsletterTab = () => {
         <div>
           <h2 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
             <Mail className="w-6 h-6 text-primary" />
-            Newsletter Subscribers
+            {t('admin.newsletter.title')}
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Manage your newsletter subscribers
+            {t('admin.newsletter.subtitle')}
           </p>
         </div>
       </div>
@@ -1566,9 +1579,9 @@ const NewsletterTab = () => {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {[
-          { label: 'Total Subscribers', value: stats.total, icon: Mail, color: 'primary' },
-          { label: 'Read', value: stats.read, icon: Eye, color: 'green' },
-          { label: 'Unread', value: stats.unread, icon: EyeOff, color: 'amber' },
+          { label: t('admin.newsletter.stats.total'), value: stats.total, icon: Mail, color: 'primary' },
+          { label: t('admin.newsletter.stats.read'), value: stats.read, icon: Eye, color: 'green' },
+          { label: t('admin.newsletter.stats.unread'), value: stats.unread, icon: EyeOff, color: 'amber' },
         ].map((stat, i) => (
           <motion.div
             key={i}
@@ -1608,7 +1621,7 @@ const NewsletterTab = () => {
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 }`}
               >
-                {filter}
+                {filter === 'All' ? t('admin.newsletter.filter.all') : filter === 'Read' ? t('admin.newsletter.filter.read') : t('admin.newsletter.filter.unread')}
               </button>
             ))}
           </div>
@@ -1619,9 +1632,9 @@ const NewsletterTab = () => {
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
             className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
           >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="email">Email A-Z</option>
+            <option value="newest">{t('admin.newsletter.sort.newest')}</option>
+            <option value="oldest">{t('admin.newsletter.sort.oldest')}</option>
+            <option value="email">{t('admin.newsletter.sort.email')}</option>
           </select>
         </div>
 
@@ -1630,7 +1643,7 @@ const NewsletterTab = () => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search subscribers..."
+              placeholder={t('admin.newsletter.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -1646,7 +1659,7 @@ const NewsletterTab = () => {
           {/* Export */}
           <button onClick={exportCSV} disabled={filteredSubscribers.length === 0}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors">
-            <Download className="w-4 h-4" /> Export CSV
+            <Download className="w-4 h-4" /> {t('admin.newsletter.exportButton')}
           </button>
         </div>
       </div>
@@ -1654,14 +1667,14 @@ const NewsletterTab = () => {
       {/* Subscribers List */}
       {loading && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading subscribers...</p>
+          <p className="text-muted-foreground">{t('admin.newsletter.loading')}</p>
         </div>
       )}
 
       {!loading && paginatedSubscribers.length === 0 && (
         <div className="text-center py-12 bg-card rounded-xl border border-border">
           <Mail className="w-12 h-12 text-muted-foreground mx-auto opacity-50 mb-3" />
-          <p className="text-muted-foreground">No subscribers found</p>
+          <p className="text-muted-foreground">{t('admin.newsletter.noSubscribers')}</p>
         </div>
       )}
 
@@ -1704,14 +1717,14 @@ const NewsletterTab = () => {
                     <p className="font-medium text-foreground truncate">{subscriber.email}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs text-muted-foreground">
-                        Subscribed: {new Date(subscriber.created_at).toLocaleDateString()}
+                        {t('admin.newsletter.subscribed')}: {new Date(subscriber.created_at).toLocaleDateString()}
                       </span>
                       <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
                         subscriber.read
                           ? 'bg-green-500/10 text-green-700 border border-green-200'
                           : 'bg-amber-500/10 text-amber-700 border border-amber-200'
                       }`}>
-                        {subscriber.read ? 'Read' : 'Unread'}
+                        {subscriber.read ? t('admin.newsletter.stats.read') : t('admin.newsletter.stats.unread')}
                       </span>
                     </div>
                   </div>

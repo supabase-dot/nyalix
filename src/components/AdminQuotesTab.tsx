@@ -185,7 +185,7 @@ const AdminQuotesTab = () => {
     const taxRate = parseFloat(pricingData.taxRate) / 100;
 
     if (!unitPrice || unitPrice <= 0) {
-      toast.error('Please enter a valid unit price');
+      toast.error(t('quote.admin.invalidUnitPrice'));
       return;
     }
 
@@ -374,7 +374,7 @@ const AdminQuotesTab = () => {
                 : 'bg-muted text-muted-foreground hover:bg-muted/80'
             }`}
           >
-            {filter === 'All' ? 'All' : t(`quote.admin.stats.${filter.toLowerCase()}`)}
+            {filter === 'All' ? t('quote.admin.filterAll') : t(`quote.admin.stats.${filter.toLowerCase()}`)}
           </button>
         ))}
       </div>
@@ -621,11 +621,11 @@ const AdminQuotesTab = () => {
       {approvingQuote && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-card rounded-xl border border-border p-6 shadow-luxury max-w-md w-full">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Set Pricing for Quote Approval</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">{t('quote.admin.pricingModalTitle')}</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Unit Price ($)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t('quote.admin.unitPrice')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -637,7 +637,7 @@ const AdminQuotesTab = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Tax Rate (%)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">{t('quote.admin.taxRate')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -651,15 +651,15 @@ const AdminQuotesTab = () => {
               {pricingData.unitPrice && (
                 <div className="bg-muted/50 rounded-lg p-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Subtotal:</span>
+                    <span>{t('quote.admin.subtotal')}:</span>
                     <span>${(parseFloat(pricingData.unitPrice) * approvingQuote.quantity).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span>Tax ({pricingData.taxRate}%):</span>
+                    <span>{t('quote.admin.tax')} ({pricingData.taxRate}%):</span>
                     <span>${((parseFloat(pricingData.unitPrice) * approvingQuote.quantity) * (parseFloat(pricingData.taxRate) / 100)).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between font-semibold border-t pt-2">
-                    <span>Total:</span>
+                    <span>{t('quote.admin.total')}:</span>
                     <span>${((parseFloat(pricingData.unitPrice) * approvingQuote.quantity) * (1 + parseFloat(pricingData.taxRate) / 100)).toFixed(2)}</span>
                   </div>
                 </div>
@@ -671,13 +671,13 @@ const AdminQuotesTab = () => {
                 onClick={() => setApprovingQuote(null)}
                 className="flex-1 px-4 py-2 bg-muted text-foreground rounded-lg font-medium hover:bg-muted/80 transition-all"
               >
-                Cancel
+                {t('quote.admin.cancel')}
               </button>
               <button
                 onClick={approveQuoteWithPricing}
                 className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/80 transition-all"
               >
-                Approve & Send Invoice
+                {t('quote.admin.approveAndSendInvoice')}
               </button>
             </div>
           </div>
