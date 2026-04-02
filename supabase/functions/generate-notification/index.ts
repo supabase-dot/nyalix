@@ -1,5 +1,14 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
+import { 
+  generateWelcomeEmail, 
+  generateInvoiceEmail, 
+  generateStatusUpdateEmail,
+  generateQuoteRequestEmail,
+  generateQuoteApprovalEmail,
+  getStatusTranslation,
+  getTranslation
+} from '../_shared/emailTemplates.ts'
 
 interface GenerateNotificationRequest {
   event: 'registration' | 'order_placed' | 'order_status_update'
@@ -110,7 +119,7 @@ async function generateNotifications(
       type: 'email',
       event: 'registration',
       recipient: profile.email,
-      subject: 'Welcome to Nyalix Medical PVT LTD!',
+      subject: getTranslation(profile.language || 'en', 'welcomeEmailSubject'),
       message: emailHtml,
       userId
     })
@@ -139,7 +148,7 @@ async function generateNotifications(
       type: 'email',
       event: 'order_placed',
       recipient: profile.email,
-      subject: `Order Confirmation - ${orderId}`,
+      subject: `${getTranslation(profile.language || 'en', 'orderConfirmationSubject')} - ${orderId}`,
       message: emailHtml,
       orderId,
       userId
@@ -182,7 +191,7 @@ async function generateNotifications(
       type: 'email',
       event: 'order_status_update',
       recipient: profile.email,
-      subject: `Order Status Update - ${orderId}`,
+      subject: `${getTranslation(profile.language || 'en', 'statusUpdateSubject')} - ${orderId}`,
       message: emailHtml,
       orderId,
       userId
