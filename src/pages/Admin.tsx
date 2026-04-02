@@ -1793,6 +1793,7 @@ const NewsletterTab = () => {
 
 /* ─── Admin Settings Tab ─── */
 const AdminSettingsTab = () => {
+  const { t } = useTranslation();
   const { user, profile } = useAuth();
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [email, setEmail] = useState(profile?.email || '');
@@ -1855,32 +1856,32 @@ const AdminSettingsTab = () => {
 
   return (
     <div className="max-w-2xl">
-      <h2 className="text-lg font-display font-semibold text-foreground mb-6">Admin Settings</h2>
+      <h2 className="text-lg font-display font-semibold text-foreground mb-6">{t('admin.settings.title')}</h2>
       <form onSubmit={handleSaveProfile} className="bg-card rounded-xl border border-border p-6 shadow-luxury space-y-5">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
+          <label className="block text-sm font-medium text-foreground mb-1">{t('admin.settings.fullName')}</label>
           <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required
           className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+          <label className="block text-sm font-medium text-foreground mb-1">{t('admin.settings.email')}</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required
           className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
+          <label className="block text-sm font-medium text-foreground mb-1">{t('admin.settings.phone')}</label>
           <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)}
           className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">Country</label>
+          <label className="block text-sm font-medium text-foreground mb-1">{t('admin.settings.country')}</label>
           <input type="text" value={country} onChange={(e) => setCountry(e.target.value)}
           className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">New Password <span className="text-muted-foreground font-normal">(leave blank to keep current)</span></label>
+          <label className="block text-sm font-medium text-foreground mb-1">{t('admin.settings.newPassword')} <span className="text-muted-foreground font-normal">{t('admin.settings.leaveBlank')}</span></label>
           <div className="relative">
-            <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="••••••••"
+            <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder={t('admin.settings.passwordPlaceholder')}
             className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring pr-10" />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -1889,7 +1890,7 @@ const AdminSettingsTab = () => {
         </div>
         <button type="submit" disabled={saving}
         className="w-full px-6 py-3 bg-gradient-gold rounded-lg font-semibold text-white hover:opacity-90 transition-all shadow-gold disabled:opacity-50">
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? t('admin.settings.saving') : t('admin.settings.saveChanges')}
         </button>
       </form>
     </div>);
@@ -1898,6 +1899,7 @@ const AdminSettingsTab = () => {
 
 /* ─── Certificates Tab ─── */
 const CertificatesTab = () => {
+  const { t } = useTranslation();
   const [certs, setCerts] = useState<{id: string;title: string;title_ar: string;type: string;file_url: string;}[]>([]);
   const [uploading, setUploading] = useState(false);
 
@@ -1969,11 +1971,11 @@ const CertificatesTab = () => {
 
   return (
     <div>
-      <h2 className="text-lg font-display font-semibold text-foreground mb-4">Certificates</h2>
+      <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('admin.certificates.title')}</h2>
       <form onSubmit={uploadCert} className="bg-card rounded-xl border border-border p-6 shadow-luxury mb-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <input name="title" required placeholder="Title (EN)" className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm" />
-          <input name="title_ar" placeholder="Title (AR)" className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm" />
+          <input name="title" required placeholder={t('admin.certificates.titleEn')} className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm" />
+          <input name="title_ar" placeholder={t('admin.certificates.titleAr')} className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm" />
           <select name="type" className="px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm">
             <option value="ISO">ISO</option><option value="CE">CE</option><option value="FDA">FDA</option>
           </select>
@@ -1981,7 +1983,7 @@ const CertificatesTab = () => {
         <div className="flex gap-4 items-center">
           <input name="file" type="file" required accept="image/*,.pdf" className="text-sm text-foreground" />
           <button type="submit" disabled={uploading} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium disabled:opacity-50">
-            {uploading ? 'Uploading...' : 'Upload'}
+            {uploading ? t('admin.certificates.uploading') : t('admin.certificates.upload')}
           </button>
         </div>
       </form>
