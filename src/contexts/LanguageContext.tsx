@@ -28,6 +28,20 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setIsInitialized(true);
   }, [i18n]);
 
+  // Listen for language changes from profile loading
+  useEffect(() => {
+    const handleLanguageChange = (e: CustomEvent) => {
+      const newLang = e.detail as Language;
+      if ((newLang === 'en' || newLang === 'ar') && newLang !== language) {
+        setLanguageState(newLang);
+        i18n.changeLanguage(newLang);
+      }
+    };
+
+    window.addEventListener('languageChange', handleLanguageChange as EventListener);
+    return () => window.removeEventListener('languageChange', handleLanguageChange as EventListener);
+  }, [i18n, language]);
+
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     i18n.changeLanguage(lang);

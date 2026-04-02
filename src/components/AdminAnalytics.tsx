@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays, subMonths, startOfDay } from 'date-fns';
 import * as Recharts from 'recharts';
@@ -68,6 +69,7 @@ interface Props {
 
 const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
   const { t } = useTranslation();
+  const { isRTL } = useLanguage();
   const [range, setRange] = useState<Range>('30d');
   const [customStart, setCustomStart] = useState<string>('');
   const [customEnd, setCustomEnd] = useState<string>('');
@@ -362,7 +364,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
 
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* filter controls */}
       <div className="flex flex-wrap gap-2 items-center">
         {RANGE_OPTIONS.map((opt) => (
@@ -470,7 +472,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
           </div>
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
             <ChartContainer
-              config={{ orders: { label: 'Orders', color: '#3b82f6' } }}
+              config={{ orders: { label: t('admin.analytics.totalOrders'), color: '#3b82f6' } }}
             >
               <Recharts.BarChart data={ordersByDate}>
                 <Recharts.XAxis dataKey="date" />
@@ -505,11 +507,11 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
 
       {/* user charts */}
       <div className="space-y-6">
-        <h3 className="font-display font-semibold text-foreground">User Analytics</h3>
+        <h3 className="font-display font-semibold text-foreground">{t('admin.analytics.userAnalytics')}</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
             <ChartContainer
-              config={{ registrations: { label: 'Registrations', color: '#6366f1' } }}
+              config={{ registrations: { label: t('admin.analytics.newUsers'), color: '#6366f1' } }}
             >
               <Recharts.LineChart data={registrationsByDate}>
                 <Recharts.XAxis dataKey="date" />
@@ -527,17 +529,17 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
             <div className="text-sm text-muted-foreground mb-2">Active vs New</div>
             <div className="flex gap-4">
               <div className="flex-1 bg-card p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground">Active Users</p>
+                <p className="text-xs text-muted-foreground">{t('admin.analytics.activeUsers')}</p>
                 <p className="text-xl font-bold">{activeUsersCount}</p>
               </div>
               <div className="flex-1 bg-card p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground">New Users</p>
+                <p className="text-xs text-muted-foreground">{t('admin.analytics.newUsersLabel')}</p>
                 <p className="text-xl font-bold">{newUsersCount}</p>
               </div>
             </div>
           </div>
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury lg:col-span-2">
-            <h4 className="text-sm font-medium text-foreground mb-2">Top Countries</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">{t('admin.analytics.topCountries')}</h4>
             <ul className="space-y-1">
               {countryCounts.map((c) => (
                 <li key={c.country} className="flex justify-between">
@@ -552,20 +554,20 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
 
       {/* product charts */}
       <div className="space-y-6">
-        <h3 className="font-display font-semibold text-foreground">Product Analytics</h3>
+        <h3 className="font-display font-semibold text-foreground">{t('admin.analytics.productAnalytics')}</h3>
         
         {/* product performance overview */}
         <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
-          <h4 className="text-sm font-medium text-foreground mb-4">Product Performance Overview</h4>
+          <h4 className="text-sm font-medium text-foreground mb-4">{t('admin.analytics.productPerformanceOverview')}</h4>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="border-b border-border">
                 <tr>
-                  <th className="text-left py-2 px-2 text-muted-foreground">Product</th>
-                  <th className="text-right py-2 px-2 text-muted-foreground">Views</th>
-                  <th className="text-right py-2 px-2 text-muted-foreground">Orders</th>
-                  <th className="text-right py-2 px-2 text-muted-foreground">Revenue</th>
-                  <th className="text-right py-2 px-2 text-muted-foreground">Stock</th>
+                  <th className="text-left py-2 px-2 text-muted-foreground">{t('admin.analytics.product')}</th>
+                  <th className="text-right py-2 px-2 text-muted-foreground">{t('admin.analytics.views')}</th>
+                  <th className="text-right py-2 px-2 text-muted-foreground">{t('admin.analytics.orders')}</th>
+                  <th className="text-right py-2 px-2 text-muted-foreground">{t('admin.analytics.revenue')}</th>
+                  <th className="text-right py-2 px-2 text-muted-foreground">{t('admin.analytics.stock')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -588,7 +590,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
         {/* newly added products */}
         {newlyAddedProducts.length > 0 && (
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
-            <h4 className="text-sm font-medium text-foreground mb-4">🆕 Recently Added Products</h4>
+            <h4 className="text-sm font-medium text-foreground mb-4">{t('admin.analytics.recentlyAddedProducts')}</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {newlyAddedProducts.map((p) => (
                 <div key={p.id} className="px-3 py-2 bg-muted rounded-lg">
@@ -608,7 +610,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
-            <h4 className="text-sm font-medium text-foreground mb-2">Top Selling Products</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">{t('admin.analytics.topSellingProducts')}</h4>
             <ul className="space-y-1 text-sm">
               {topProducts.map((p) => (
                 <li key={p.name} className="flex justify-between">
@@ -619,7 +621,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
             </ul>
           </div>
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
-            <h4 className="text-sm font-medium text-foreground mb-2">Most Viewed Products</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">{t('admin.analytics.mostViewedProducts')}</h4>
             <ul className="space-y-1 text-sm">
               {mostViewedProducts.map((p) => (
                 <li key={p.name} className="flex justify-between">
@@ -630,7 +632,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
             </ul>
           </div>
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury lg:col-span-2">
-            <h4 className="text-sm font-medium text-foreground mb-2">Low Stock Products</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">{t('admin.analytics.lowStockProducts')}</h4>
             <ul className="space-y-1 text-sm">
               {lowStock.map((p) => (
                 <li key={p.id} className="flex justify-between">
@@ -642,7 +644,7 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
           </div>
           <div className="bg-card rounded-xl border border-border p-4 shadow-luxury lg:col-span-2">
             <ChartContainer
-              config={{ revenue: { label: 'Revenue', color: '#f59e0b' } }}
+              config={{ revenue: { label: t('admin.analytics.revenue'), color: '#f59e0b' } }}
             >
               <Recharts.BarChart data={revenueByProduct}>
                 <Recharts.XAxis dataKey="name" />
