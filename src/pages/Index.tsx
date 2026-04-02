@@ -1,4 +1,5 @@
 import HeroSection from '@/components/HeroSection';
+import FeaturedProducts from '@/components/FeaturedProducts';
 import ProductCategoriesSection from '@/components/ProductCategoriesSection';
 import WhyChooseUs from '@/components/WhyChooseUs';
 import CertificatesSection from '@/components/CertificatesSection';
@@ -24,6 +25,7 @@ const Index = () => {
           </Link>
         </div>
       </div>
+      <FeaturedProducts />
       <ProductCategoriesSection />
       <CertificatesSection />
       <WhyChooseUs />
