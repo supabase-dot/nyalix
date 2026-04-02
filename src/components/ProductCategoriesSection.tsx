@@ -87,13 +87,20 @@ const ProductCategoriesSection = () => {
                       {label}
                     </p>
                     <span className="text-xs text-primary mt-1 inline-block font-medium group-hover:underline">
-                      View All Products
+                      {t('home.viewAll')}
                     </span>
                   </div>
                 </Link>
               </motion.div>
             );
           })}
+        </div>
+
+        {/* View All Products Button */}
+        <div className="text-center mt-12">
+          <Link to="/products" className="inline-flex items-center gap-2 px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-navy-light transition-colors">
+            {t('home.viewAll')}
+          </Link>
         </div>
       </div>
     </section>

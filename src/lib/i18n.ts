@@ -47,6 +47,7 @@ const resources = {
         introText: "Empowering healthcare with precision and quality. Discover our wide range of medical equipment and supplies. From diagnostics to surgical instruments, we've got you covered. Join thousands of satisfied customers who trust NyaliX Medical for their healthcare needs.",
         readMore: "READ MORE",
         productCategories: "PRODUCT CATEGORIES",
+        viewAll: "View All Products",
       },
       featured: {
         title: "Featured Medical Devices",
@@ -677,6 +678,7 @@ const resources = {
         introText: "تمكين الرعاية الصحية بالدقة والجودة. اكتشف مجموعتنا الواسعة من المعدات والمستلزمات الطبية. من التشخيص إلى الأدوات الجراحية، لدينا كل ما تحتاجه. انضم إلى آلاف العملاء الراضين الذين يثقون بشركة نياليكس الطبية لاحتياجاتهم الصحية.",
         readMore: "اقرأ المزيد",
         productCategories: "فئات المنتجات",
+        viewAll: "عرض جميع المنتجات",
       },
       featured: {
         title: "الأجهزة الطبية المميزة",
