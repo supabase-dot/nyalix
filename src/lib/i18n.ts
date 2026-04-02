@@ -82,6 +82,8 @@ const resources = {
         noProductsFound: "No products found matching your search.",
         product: "product",
         products: "products",
+        customerReviews: "Customer Reviews",
+        noReviewsYet: "No reviews yet. Be the first to review this product after your delivery!",
       },
       cart: {
         title: "Shopping Cart",
@@ -719,6 +721,8 @@ const resources = {
         noProductsFound: "لا توجد منتجات مطابقة لبحثك.",
         product: "منتج",
         products: "منتجات",
+        customerReviews: "تقييمات العملاء",
+        noReviewsYet: "لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج بعد استلامه!",
       },
       cart: {
         title: "سلة التسوق",
