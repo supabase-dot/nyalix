@@ -1,5 +1,6 @@
 import { ChevronRight, Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 interface Category {
   en: string;
@@ -24,6 +25,7 @@ const CategorySidebar = ({
   onSearchChange,
 }: CategorySidebarProps) => {
   const { language } = useLanguage();
+  const { t } = useTranslation();
 
   return (
     <aside className="lg:w-60 shrink-0">
@@ -31,7 +33,7 @@ const CategorySidebar = ({
         {/* Header */}
         <div className="bg-primary px-4 py-3">
           <h2 className="font-display font-bold text-primary-foreground uppercase tracking-widest text-sm">
-            Categories
+            {t('products.categories')}
           </h2>
         </div>
 
@@ -41,7 +43,7 @@ const CategorySidebar = ({
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search..."
+              placeholder={t('products.searchPlaceholder')}
               value={search}
               onChange={e => onSearchChange(e.target.value)}
               className="w-full pl-8 pr-2 py-1.5 text-xs rounded border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
