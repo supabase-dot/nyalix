@@ -1902,6 +1902,8 @@ const CertificatesTab = () => {
   const { t } = useTranslation();
   const [certs, setCerts] = useState<{id: string;title: string;title_ar: string;type: string;file_url: string;}[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {fetchCerts();}, []);
 
@@ -1954,6 +1956,7 @@ const CertificatesTab = () => {
       if (form && typeof form.reset === 'function') {
         form.reset();
       }
+      setSelectedFileName('');
       fetchCerts();
     } catch (error) {
       console.error('Upload error:', error);
@@ -1980,9 +1983,29 @@ const CertificatesTab = () => {
             <option value="ISO">ISO</option><option value="CE">CE</option><option value="FDA">FDA</option>
           </select>
         </div>
-        <div className="flex gap-4 items-center">
-          <input name="file" type="file" required accept="image/*,.pdf" className="text-sm text-foreground" />
-          <button type="submit" disabled={uploading} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium disabled:opacity-50">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <input
+            ref={fileInputRef}
+            name="file"
+            type="file"
+            required
+            accept="image/*,.pdf"
+            className="hidden"
+            onChange={(e) => setSelectedFileName(e.target.files?.[0]?.name ?? '')}
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors"
+          >
+            {t('admin.certificates.chooseFile')}
+          </button>
+          <span className="text-sm text-muted-foreground">{selectedFileName || t('admin.certificates.noFileChosen')}</span>
+          <button
+            type="submit"
+            disabled={uploading}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium disabled:opacity-50"
+          >
             {uploading ? t('admin.certificates.uploading') : t('admin.certificates.upload')}
           </button>
         </div>

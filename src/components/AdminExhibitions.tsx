@@ -270,6 +270,7 @@ const MediaManager = ({ exhibitionId, onClose }: { exhibitionId: string; onClose
 
 /* ── Main Admin Exhibitions Tab ── */
 const AdminExhibitions = () => {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: exhibitions, isLoading, refetch } = useExhibitions();
   const [showForm, setShowForm] = useState(false);
@@ -297,8 +298,8 @@ const AdminExhibitions = () => {
         {mediaId && <MediaManager exhibitionId={mediaId} onClose={() => setMediaId(null)} />}
         {confirm && (
           <ConfirmModal
-            title="Delete Exhibition"
-            message="This will permanently delete the exhibition and all its media. This action cannot be undone."
+            title={t('admin.exhibitions.deleteExhibitionTitle')}
+            message={t('admin.exhibitions.deleteExhibitionConfirm')}
             onConfirm={() => deleteExhibition(confirm.id)}
             onCancel={() => setConfirm(null)}
           />
@@ -306,10 +307,10 @@ const AdminExhibitions = () => {
       </AnimatePresence>
 
       <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display font-bold text-foreground text-xl">Exhibitions</h2>
+        <h2 className="font-display font-bold text-foreground text-xl">{t('admin.exhibitions.listTitle')}</h2>
         <button onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-          <Plus className="w-4 h-4" /> New Exhibition
+          <Plus className="w-4 h-4" /> {t('admin.exhibitions.newExhibition')}
         </button>
       </div>
 

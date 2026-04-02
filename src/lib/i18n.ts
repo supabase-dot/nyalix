@@ -340,6 +340,7 @@ const resources = {
         loading: "Loading admin dashboard...",
         /* the rest of admin is unchanged */
         exhibitions: {
+          listTitle: "Exhibitions",
           editExhibition: "Edit Exhibition",
           newExhibition: "New Exhibition",
           title: "Title",
@@ -356,6 +357,8 @@ const resources = {
           manageMedia: "Manage Media",
           deleteMediaTitle: "Delete Media",
           deleteMediaConfirm: "Are you sure you want to delete this media file?",
+          deleteExhibitionTitle: "Delete Exhibition",
+          deleteExhibitionConfirm: "This will permanently delete the exhibition and all its media. This action cannot be undone.",
           uploading: "Uploading...",
           titleRequired: "Title is required",
           updated: "Exhibition updated",
@@ -412,6 +415,8 @@ const resources = {
           titleAr: "Title (AR)",
           uploading: "Uploading...",
           upload: "Upload",
+          chooseFile: "Choose File",
+          noFileChosen: "No file chosen",
         },
       },
       certifications: {
@@ -997,6 +1002,7 @@ const resources = {
         loading: "جاري تحميل لوحة التحكم...",
 
         exhibitions: {
+          listTitle: "المعارض",
           editExhibition: "تعديل المعرض",
           newExhibition: "معرض جديد",
           title: "العنوان",
@@ -1005,6 +1011,8 @@ const resources = {
           location: "الموقع",
           date: "التاريخ",
           coverImage: "صورة الغلاف",
+          deleteExhibitionTitle: "حذف المعرض",
+          deleteExhibitionConfirm: "سيؤدي هذا إلى حذف المعرض وجميع وسائطه نهائيًا. لا يمكن التراجع عن هذا الإجراء.",
         },
         saving: "جارٍ الحفظ...",
         update: "تحديث",
