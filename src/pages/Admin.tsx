@@ -11,6 +11,7 @@ import { type LucideIcon, Plus, Pencil, Trash2, Package, ShoppingBag, Users, Mes
 import AdminExhibitions from '@/components/AdminExhibitions';
 import AdminAnalytics from '@/components/AdminAnalytics';
 import AdminQuotesTab from '@/components/AdminQuotesTab';
+import AdminMessagesTab from '@/components/AdminMessagesTab';
 import { AdminSidebar, type AdminTab } from '@/components/AdminSidebar';
 import { useCategoriesRealtime, type Category } from '@/hooks/useCategories';
 import { generateAndSendNotifications } from '@/lib/notifications';
@@ -1383,41 +1384,7 @@ const Admin = () => {
         {tab === 'exhibitions' && <AdminExhibitions />}
 
         {/* Messages */}
-        {tab === 'messages' && (
-          <div className="space-y-4">
-            <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('admin.messagesTitle')}</h2>
-            {messages.length === 0 && <p className="text-muted-foreground">No messages yet.</p>}
-            {messages.map((m) => (
-              <div key={m.id} className={`bg-card rounded-xl border border-border p-5 shadow-luxury ${!m.read ? 'border-l-4 border-l-accent' : ''}`}>
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <p className="font-semibold text-foreground">{m.name}</p>
-                    <p className="text-sm text-muted-foreground">{m.email}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {!m.read && <span className="w-2 h-2 rounded-full bg-red-500" />}
-                    <span className="text-xs text-muted-foreground">{new Date(m.created_at).toLocaleDateString()}</span>
-                    <button onClick={() => deleteMessage(m.id)} className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg transition-colors" title="Delete message">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-                <p className="text-sm text-foreground">{m.message}</p>
-                {!m.read && (
-                  <button
-                    onClick={async () => {
-                      await supabase.from('contact_messages').update({ read: true }).eq('id', m.id);
-                      setMessages((prev) => prev.map((msg) => (msg.id === m.id ? { ...msg, read: true } : msg)));
-                    }}
-                    className="mt-2 text-xs text-accent hover:underline"
-                  >
-                    Mark as read
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        {tab === 'messages' && <AdminMessagesTab />}
 
         {/* Quotes */}
         {tab === 'quotes' && <AdminQuotesTab />}

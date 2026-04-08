@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, X, Star, MessageSquare, FileText, Settings } from 'lucide-react';
+import { type LucideIcon, User, Package, Clock, CheckCircle, Truck, XCircle, ChevronDown, ChevronUp, X, Star, MessageSquare, FileText, Settings, Edit2, Phone, Globe, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import StarRating from '@/components/StarRating';
 import { useTranslation } from 'react-i18next';
@@ -187,7 +187,12 @@ const Profile = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [messageReplies, setMessageReplies] = useState<Record<string, any[]>>({});
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const [expandedMessage, setExpandedMessage] = useState<string | null>(null);
+  const [editingMessage, setEditingMessage] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState('');
   const [reviewModal, setReviewModal] = useState<{
     open: boolean;orderId: string;productId: string;productName: string;
   } | null>(null);
@@ -232,9 +237,47 @@ const Profile = () => {
       toast.error('Unable to load quotes');
     }
   }, [user]);
+
+  const fetchMessages = useCallback(async () => {
+    if (!user || !user.id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching messages:', error);
+        return;
+      }
+
+      setMessages(data ?? []);
+
+      // Fetch replies for all messages
+      const { data: repliesData } = await supabase
+        .from('contact_message_replies')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (repliesData) {
+        const repliesByMessageId: Record<string, any[]> = {};
+        repliesData.forEach((reply: any) => {
+          if (!repliesByMessageId[reply.message_id]) {
+            repliesByMessageId[reply.message_id] = [];
+          }
+          repliesByMessageId[reply.message_id].push(reply);
+        });
+        setMessageReplies(repliesByMessageId);
+      }
+    } catch (err) {
+      console.error('Exception fetching messages:', err);
+    }
+  }, [user]);
   useEffect(() => {
-    if (user) {fetchOrders();fetchReviews();fetchQuotes();}
-  }, [user, fetchOrders, fetchReviews, fetchQuotes]);
+    if (user) {fetchOrders();fetchReviews();fetchQuotes();fetchMessages();}
+  }, [user, fetchOrders, fetchReviews, fetchQuotes, fetchMessages]);
 
   const getExistingReview = (orderId: string, productId: string) =>
   reviews.find((r) => r.order_id === orderId && r.product_id === productId);
@@ -245,6 +288,50 @@ const Profile = () => {
     if (error) {toast.error(error.message);return;}
     toast.success('Order cancelled successfully');
     fetchOrders();
+  };
+
+  const handleEditMessage = async (messageId: string, newText: string) => {
+    if (!newText.trim()) {
+      toast.error('Message cannot be empty');
+      return;
+    }
+
+    const { error } = await supabase
+      .from('contact_messages')
+      .update({
+        message: newText,
+        is_edited: true,
+        edited_at: new Date().toISOString(),
+        edit_count: (messages.find((m) => m.id === messageId)?.edit_count || 0) + 1,
+      })
+      .eq('id', messageId);
+
+    if (error) {
+      toast.error('Failed to update message');
+      return;
+    }
+
+    toast.success('Message updated successfully');
+    setEditingMessage(null);
+    setEditingText('');
+    fetchMessages();
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!confirm('Are you sure you want to delete this message?')) return;
+
+    const { error } = await supabase
+      .from('contact_messages')
+      .delete()
+      .eq('id', messageId);
+
+    if (error) {
+      toast.error('Failed to delete message');
+      return;
+    }
+
+    toast.success('Message deleted');
+    fetchMessages();
   };
 
   if (loading || !user) return null;
@@ -587,9 +674,204 @@ const Profile = () => {
             </div>
           }
         </div>
-      </div>
-    </div>);
 
+        {/* Messages */}
+        <div>
+          <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('user.profile.myMessages') || 'My Messages'}</h2>
+          {messages.length === 0 ? (
+            <div className="bg-card rounded-xl border border-border p-8 text-center shadow-luxury">
+              <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">{t('user.profile.noMessages') || 'No messages sent yet.'}</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message, i) => {
+                const isExpanded = expandedMessage === message.id;
+                const replies = messageReplies[message.id] || [];
+                const statusColors: Record<string, { bg: string; color: string; icon: React.ComponentType<any> }> = {
+                  new: { bg: 'bg-yellow-100', color: 'text-yellow-700', icon: Clock },
+                  replied: { bg: 'bg-blue-100', color: 'text-blue-700', icon: MessageSquare },
+                  resolved: { bg: 'bg-green-100', color: 'text-green-700', icon: CheckCircle },
+                };
+                const statusConfig = statusColors[message.status] || statusColors.new;
+                const StatusIcon = statusConfig.icon;
+
+                return (
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="bg-card rounded-xl border border-border shadow-luxury overflow-hidden"
+                  >
+                    {/* Message Header */}
+                    <button
+                      onClick={() => setExpandedMessage(isExpanded ? null : message.id)}
+                      className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.color}`}
+                          >
+                            <StatusIcon className="w-3 h-3" />
+                            {message.status.charAt(0).toUpperCase() + message.status.slice(1)}
+                          </span>
+                          {message.is_edited && (
+                            <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
+                              <Edit2 className="w-3 h-3" />
+                              Edited
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-foreground font-medium mb-1">
+                          {message.message.substring(0, 100)}
+                          {message.message.length > 100 ? '...' : ''}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {new Date(message.created_at).toLocaleDateString()} at{' '}
+                          {new Date(message.created_at).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        {replies.length > 0 && (
+                          <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
+                            {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+                          </span>
+                        )}
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </button>
+
+                    {/* Message Details (Expanded) */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="border-t border-border bg-muted/30 p-5 space-y-4"
+                        >
+                          {/* Message Content */}
+                          {editingMessage === message.id ? (
+                            <div className="space-y-3">
+                              <textarea
+                                value={editingText}
+                                onChange={(e) => setEditingText(e.target.value)}
+                                rows={4}
+                                maxLength={1000}
+                                className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleEditMessage(message.id, editingText)}
+                                  className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                                >
+                                  Save Changes
+                                </button>
+                                <button
+                                  onClick={() => setEditingMessage(null)}
+                                  className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <h4 className="text-sm font-semibold text-foreground mb-2">Message</h4>
+                              <p className="text-sm text-foreground whitespace-pre-wrap">{message.message}</p>
+                              {message.is_edited && (
+                                <p className="text-xs text-muted-foreground mt-2">
+                                  ✏️ Last edited: {message.edited_at ? new Date(message.edited_at).toLocaleDateString() : 'N/A'}
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Contact Details */}
+                          {(message.shipping_phone || message.shipping_country) && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-card rounded-lg border border-border">
+                              {message.shipping_phone && (
+                                <div className="flex items-center gap-2">
+                                  <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
+                                  <span className="text-sm text-foreground">{message.shipping_phone}</span>
+                                </div>
+                              )}
+                              {message.shipping_country && (
+                                <div className="flex items-center gap-2">
+                                  <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
+                                  <span className="text-sm text-foreground">{message.shipping_country}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Replies Section */}
+                          {replies.length > 0 && (
+                            <div className="pt-2 border-t border-border">
+                              <h4 className="text-sm font-semibold text-foreground mb-3">Admin Responses</h4>
+                              <div className="space-y-3 bg-card rounded-lg p-3 border border-border">
+                                {replies.map((reply) => (
+                                  <div key={reply.id} className="border-l-2 border-accent pl-3">
+                                    <p className="text-xs font-medium text-muted-foreground mb-1">Admin Reply</p>
+                                    <p className="text-sm text-foreground whitespace-pre-wrap mb-1">
+                                      {reply.reply_text}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {new Date(reply.created_at).toLocaleDateString()} at{' '}
+                                      {new Date(reply.created_at).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                      })}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Action Buttons */}
+                          {!editingMessage || editingMessage !== message.id ? (
+                            <div className="flex gap-2 pt-2 border-t border-border">
+                              {message.status === 'new' && (
+                                <button
+                                  onClick={() => {
+                                    setEditingMessage(message.id);
+                                    setEditingText(message.message);
+                                  }}
+                                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                                >
+                                  <Edit2 className="w-4 h-4" /> Edit Message
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteMessage(message.id)}
+                                className="px-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ) : null}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Profile;

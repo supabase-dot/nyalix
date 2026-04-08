@@ -27,7 +27,7 @@ export const sendNotification = async (type: 'email' | 'whatsapp', event: 'regis
 }
 
 export const sendEmail = async (
-  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved',
+  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved' | 'contact_submitted' | 'contact_replied' | 'contact_resolved',
   to: string,
   data?: Record<string, unknown>,
   userId?: string,

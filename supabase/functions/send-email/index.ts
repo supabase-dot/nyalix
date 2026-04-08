@@ -2,13 +2,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
 interface EmailRequest {
-  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved'
+  type: 'invitation' | 'welcome' | 'order_invoice' | 'order_status' | 'password_reset' | 'quote_pending' | 'quote_responded' | 'quote_approved' | 'contact_submitted' | 'contact_replied' | 'contact_resolved'
   to: string
   subject?: string
   data?: Record<string, unknown>
   userId?: string
   orderId?: string
   quoteId?: string
+  messageId?: string
 }
 
 interface UserProfile {
@@ -140,6 +141,15 @@ async function generateEmailContent(
 
     case 'quote_approved':
       return await generateQuoteApprovedEmail(supabaseClient, data?.quoteId)
+
+    case 'contact_submitted':
+      return generateContactSubmittedEmail(data)
+
+    case 'contact_replied':
+      return generateContactRepliedEmail(data)
+
+    case 'contact_resolved':
+      return generateContactResolvedEmail(data)
 
     case 'password_reset':
       return generatePasswordResetEmail(data)
@@ -1064,6 +1074,170 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
               <p>24/7 Customer Support Available</p>
               <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
             </div>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+function generateContactSubmittedEmail(data: Record<string, unknown>): { subject: string; html: string } {
+  const name = (data?.name as string) || 'Valued Customer'
+
+  return {
+    subject: 'Message Received - Nyalix Medical PVT LTD',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Message Received</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+          .header { background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 30px 20px; text-align: center; }
+          .content { padding: 30px 20px; color: #333; }
+          .message-info { background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #17455a; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>Thank You for Contacting Us</h2>
+          </div>
+          <div class="content">
+            <h3>Dear ${name},</h3>
+            <p>We have received your message and appreciate you taking the time to contact Nyalix Medical PVT LTD.</p>
+            
+            <div class="message-info">
+              <p><strong>What happens next?</strong></p>
+              <p>Our team will review your message and respond as soon as possible, typically within 24-48 hours.</p>
+              <p>You can view your message status and our response in your profile dashboard.</p>
+            </div>
+
+            <p>If you need immediate assistance, please contact us directly:</p>
+            <ul>
+              <li>Email: <a href="mailto:info@nyalix.com">info@nyalix.com</a></li>
+              <li>India: <a href="tel:+917339700569">+917339700569</a></li>
+              <li>Sudan: <a href="tel:+249116648870">+249116648870</a></li>
+            </ul>
+
+            <p>Thank you for your patience!</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>This is an automated confirmation. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+function generateContactRepliedEmail(data: Record<string, unknown>): { subject: string; html: string } {
+  const reply = ((data?.reply || '') as string).substring(0, 200) || 'Thank you for reaching out.'
+
+  return {
+    subject: 'We\'ve Replied to Your Message - Nyalix Medical PVT LTD',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Reply to Your Message</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+          .header { background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 30px 20px; text-align: center; }
+          .content { padding: 30px 20px; color: #333; }
+          .reply-box { background-color: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #17455a; }
+          .button { display: inline-block; background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>New Reply to Your Message</h2>
+          </div>
+          <div class="content">
+            <h3>We Have Replied!</h3>
+            <p>Our team has responded to your message. Here's a preview of their response:</p>
+            
+            <div class="reply-box">
+              <p>${reply}</p>
+            </div>
+
+            <p>To view the full reply and continue the conversation, please visit your profile dashboard:</p>
+            <a href="https://nyalix.com/profile" class="button">View Full Reply</a>
+
+            <p>If you have any follow-up questions, feel free to reply directly through your dashboard.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>This is an automated notification. Please do not reply to this email.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }
+}
+
+function generateContactResolvedEmail(data: Record<string, unknown>): { subject: string; html: string } {
+  return {
+    subject: 'Your Message Has Been Resolved - Nyalix Medical PVT LTD',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Message Resolved</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+          .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+          .header { background: linear-gradient(135deg, #17455a, #2d6a8a); color: white; padding: 30px 20px; text-align: center; }
+          .content { padding: 30px 20px; color: #333; }
+          .resolved-box { background-color: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #28a745; }
+          .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Nyalix Medical PVT LTD</h1>
+            <h2>Message Resolved</h2>
+          </div>
+          <div class="content">
+            <h3>Your Inquiry Has Been Resolved</h3>
+            
+            <div class="resolved-box">
+              <p><strong style="color: #28a745;">✓ Status: Resolved</strong></p>
+              <p>Thank you for contacting Nyalix Medical PVT LTD. Our team has successfully addressed your inquiry.</p>
+            </div>
+
+            <p>You can view the complete conversation history in your profile dashboard, where all messages and replies are maintained for your reference.</p>
+
+            <p>If you have any additional questions or concerns, please don't hesitate to contact us:</p>
+            <ul>
+              <li>Email: <a href="mailto:info@nyalix.com">info@nyalix.com</a></li>
+              <li>India: <a href="tel:+917339700569">+917339700569</a></li>
+              <li>Sudan: <a href="tel:+249116648870">+249116648870</a></li>
+            </ul>
+
+            <p>We appreciate your business and look forward to serving you again!</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>This is an automated notification. Please do not reply to this email.</p>
           </div>
         </div>
       </body>
