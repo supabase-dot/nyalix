@@ -38,7 +38,7 @@ const Contact = () => {
     e.preventDefault();
     
     if (!user) {
-      toast.error('Please log in to send a message');
+      toast.error(t('contact.loginPrompt'));
       navigate('/auth');
       return;
     }
@@ -62,7 +62,7 @@ const Contact = () => {
     }).select().single();
 
     if (error) { 
-      toast.error('Failed to send message'); 
+      toast.error(t('contact.messageFailed')); 
       console.error(error);
       setSending(false);
       return; 
@@ -74,7 +74,7 @@ const Contact = () => {
         name: name,
         messageId: data.id,
       });
-      toast.success('Message sent successfully! You will receive a confirmation email.');
+      toast.success(t('contact.messageSubmitted'));
     } catch (emailError) {
       console.error('Failed to send confirmation email:', emailError);
       toast.success('Message sent! (Email could not be sent)');
@@ -101,7 +101,7 @@ const Contact = () => {
                 <AlertCircle className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-blue-900">{t('contact.loginRequired')}</p>
-                  <p className="text-xs text-blue-700 mt-1">Please log in to send a message and track it in your dashboard.</p>
+                  <p className="text-xs text-blue-700 mt-1">{t('contact.loginRequired')}</p>
                 </div>
               </div>
             )}
@@ -130,7 +130,7 @@ const Contact = () => {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Phone (Optional)</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('contact.phone')}</label>
                   <input 
                     name="phone" 
                     type="tel" 
@@ -139,7 +139,7 @@ const Contact = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Country (Optional)</label>
+                  <label className="block text-sm font-medium text-foreground mb-1">{t('contact.country')}</label>
                   <input 
                     name="country" 
                     type="text" 
@@ -189,7 +189,7 @@ const Contact = () => {
                   <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold text-foreground mb-1">India Phone</h3>
+                  <h3 className="font-display font-semibold text-foreground mb-1">{t('contact.phoneLabel')}</h3>
                   <p className="text-sm text-muted-foreground">+917339700569</p>
                 </div>
               </div>
@@ -202,7 +202,7 @@ const Contact = () => {
                   <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-display font-semibold text-foreground mb-1">Sudan Phone</h3>
+                  <h3 className="font-display font-semibold text-foreground mb-1">{t('contact.sudanPhoneLabel')}</h3>
                   <p className="text-sm text-muted-foreground">+249116648870</p>
                 </div>
               </div>

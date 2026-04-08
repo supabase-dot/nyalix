@@ -129,14 +129,14 @@ const AdminMessagesTab = () => {
       .eq('id', id);
 
     if (error) {
-      toast.error('Failed to update status');
+      toast.error(t('admin.messages.failedToUpdate'));
       return;
     }
 
     setMessages((prev) =>
       prev.map((m) => (m.id === id ? { ...m, status } : m))
     );
-    toast.success('Status updated');
+    toast.success(t('admin.messages.statusUpdated'));
 
     // Send email notification
     try {
@@ -144,7 +144,7 @@ const AdminMessagesTab = () => {
       if (message) {
         const emailType = status === 'replied' ? 'contact_replied' : 'contact_resolved';
         await sendEmail(emailType, message.email, { messageId: id, status });
-        toast.success('Notification email sent');
+        toast.success(t('admin.messages.notificationSent'));
       }
     } catch (emailError) {
       console.error('Failed to send email:', emailError);
@@ -153,7 +153,7 @@ const AdminMessagesTab = () => {
 
   const saveReply = async (messageId: string, replyText: string) => {
     if (!replyText.trim()) {
-      toast.error('Reply cannot be empty');
+      toast.error(t('admin.messages.replyEmpty'));
       return;
     }
 
@@ -166,7 +166,7 @@ const AdminMessagesTab = () => {
       });
 
     if (replyError) {
-      toast.error('Failed to save reply');
+      toast.error(t('admin.messages.failedToSave'));
       return;
     }
 
@@ -189,11 +189,11 @@ const AdminMessagesTab = () => {
     // Refetch to get the new reply
     await fetchMessages();
     setEditingReply(null);
-    toast.success('Reply sent!');
+    toast.success(t('admin.messages.replySent'));
   };
 
   const deleteMessage = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
+    if (!confirm(t('admin.messages.deleteConfirm'))) {
       return;
     }
 
@@ -203,16 +203,16 @@ const AdminMessagesTab = () => {
       .eq('id', id);
 
     if (error) {
-      toast.error('Failed to delete message');
+      toast.error(t('admin.messages.failedToDelete'));
       return;
     }
 
     setMessages((prev) => prev.filter((m) => m.id !== id));
-    toast.success('Message deleted');
+    toast.success(t('admin.toast.messageDeleted'));
   };
 
   const deleteReply = async (replyId: string) => {
-    if (!confirm('Are you sure you want to delete this reply?')) {
+    if (!confirm(t('admin.messages.replyDeleteConfirm'))) {
       return;
     }
 
@@ -222,11 +222,11 @@ const AdminMessagesTab = () => {
       .eq('id', replyId);
 
     if (error) {
-      toast.error('Failed to delete reply');
+      toast.error(t('admin.messages.failedToDeleteReply'));
       return;
     }
 
-    toast.success('Reply deleted');
+    toast.success(t('admin.messages.replyDeleted'));
     await fetchMessages();
   };
 
@@ -252,25 +252,31 @@ const AdminMessagesTab = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 className="text-lg font-display font-semibold text-foreground">
-            Messages ({stats.total})
+            {t('admin.messages.title')} ({stats.total})
           </h2>
           <div className="flex flex-wrap gap-2">
-            {(['All', 'new', 'replied', 'resolved'] as const).map((status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  statusFilter === status
-                    ? 'bg-gradient-gold text-white'
-                    : 'bg-muted text-muted-foreground hover:bg-border'
-                }`}
-              >
-                {status === 'All' ? 'All' : statusConfig[status]?.label}
-                {status !== 'All' && (
-                  <span className="ml-2 text-xs">({stats[status as keyof typeof stats]})</span>
-                )}
-              </button>
-            ))}
+            {(['All', 'new', 'replied', 'resolved'] as const).map((status) => {
+              const statusLabel = status === 'All' ? t('admin.messages.stats.all') :
+                                  status === 'new' ? t('admin.messages.status.new') :
+                                  status === 'replied' ? t('admin.messages.status.replied') :
+                                  t('admin.messages.status.resolved');
+              return (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                    statusFilter === status
+                      ? 'bg-gradient-gold text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-border'
+                  }`}
+                >
+                  {statusLabel}
+                  {status !== 'All' && (
+                    <span className="ml-2 text-xs">({stats[status as keyof typeof stats]})</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -278,7 +284,7 @@ const AdminMessagesTab = () => {
         <div className="relative">
           <input
             type="text"
-            placeholder="Search by name, email, or message content..."
+            placeholder={t('admin.messages.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2 pl-10 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -296,12 +302,12 @@ const AdminMessagesTab = () => {
 
       {loading ? (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">Loading messages...</p>
+          <p className="text-muted-foreground">{t('admin.messages.loading')}</p>
         </div>
       ) : filteredMessages.length === 0 ? (
         <div className="text-center py-12 bg-card rounded-xl border border-border">
           <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto opacity-50 mb-3" />
-          <p className="text-muted-foreground">No messages yet.</p>
+          <p className="text-muted-foreground">{t('admin.messages.noMessages')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -343,7 +349,9 @@ const AdminMessagesTab = () => {
                           )}
                           <div className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs font-medium ${statusConfig[message.status]?.bg} ${statusConfig[message.status]?.color}`}>
                             <StatusIcon className="w-3.5 h-3.5" />
-                            {statusConfig[message.status]?.label}
+                            {message.status === 'new' && t('admin.messages.status.new')}
+                            {message.status === 'replied' && t('admin.messages.status.replied')}
+                            {message.status === 'resolved' && t('admin.messages.status.resolved')}
                           </div>
                         </div>
                       </div>
@@ -379,11 +387,11 @@ const AdminMessagesTab = () => {
                     >
                       {/* Message Content */}
                       <div>
-                        <h4 className="text-sm font-semibold text-foreground mb-2">Message</h4>
+                        <h4 className="text-sm font-semibold text-foreground mb-2">{t('admin.messages.messageLabel')}</h4>
                         <p className="text-sm text-foreground whitespace-pre-wrap">{message.message}</p>
                         {message.is_edited && (
                           <p className="text-xs text-muted-foreground mt-2">
-                            ✏️ Edited {message.edit_count}x, last edit: {message.edited_at ? new Date(message.edited_at).toLocaleDateString() : 'N/A'}
+                            ✏️ {t('admin.messages.edited')} {message.edit_count}x, {t('admin.messages.lastEdit')}: {message.edited_at ? new Date(message.edited_at).toLocaleDateString() : 'N/A'}
                           </p>
                         )}
                       </div>
@@ -409,12 +417,12 @@ const AdminMessagesTab = () => {
                       {/* Replies Section */}
                       {messageReplies.length > 0 && (
                         <div className="pt-2 border-t border-border">
-                          <h4 className="text-sm font-semibold text-foreground mb-3">Conversation History</h4>
+                          <h4 className="text-sm font-semibold text-foreground mb-3">{t('admin.messages.conversationHistory')}</h4>
                           <div className="space-y-3 bg-card rounded-lg p-3 border border-border">
                             {messageReplies.map((reply) => (
                               <div key={reply.id} className="border-l-2 border-accent pl-3">
                                 <div className="flex justify-between items-start gap-2 mb-1">
-                                  <p className="text-xs font-medium text-muted-foreground">Admin Reply</p>
+                                  <p className="text-xs font-medium text-muted-foreground">{t('admin.messages.adminReply')}</p>
                                   <button
                                     onClick={() => deleteReply(reply.id)}
                                     className="p-0.5 text-destructive hover:bg-destructive/10 rounded transition-colors"
@@ -442,7 +450,7 @@ const AdminMessagesTab = () => {
                             onChange={(e) =>
                               setEditingReply({ messageId: message.id, replyText: e.target.value })
                             }
-                            placeholder="Type your reply here..."
+                            placeholder={t('admin.messages.replyPlaceholder')}
                             rows={4}
                             maxLength={1000}
                             className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
@@ -452,13 +460,13 @@ const AdminMessagesTab = () => {
                               onClick={() => saveReply(message.id, editingReply.replyText)}
                               className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-gradient-gold text-white rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
                             >
-                              <Send className="w-4 h-4" /> Send Reply
+                              <Send className="w-4 h-4" /> {t('admin.messages.sendReply')}
                             </button>
                             <button
                               onClick={() => setEditingReply(null)}
                               className="px-3 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors"
                             >
-                              Cancel
+                              {t('admin.messages.cancel')}
                             </button>
                           </div>
                         </div>
@@ -470,7 +478,7 @@ const AdminMessagesTab = () => {
                             }
                             className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                           >
-                            <MessageSquare className="w-4 h-4" /> Reply
+                            <MessageSquare className="w-4 h-4" /> {t('admin.messages.reply')}
                           </button>
                           <select
                             value={message.status}
@@ -479,11 +487,16 @@ const AdminMessagesTab = () => {
                             }
                             className="px-3 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors"
                           >
-                            {Object.entries(statusConfig).map(([key, val]) => (
-                              <option key={key} value={key}>
-                                Mark as {val.label}
-                              </option>
-                            ))}
+                            {Object.entries(statusConfig).map(([key, val]) => {
+                              const statusLabel = key === 'new' ? t('admin.messages.status.new') : 
+                                                  key === 'replied' ? t('admin.messages.status.replied') : 
+                                                  t('admin.messages.status.resolved');
+                              return (
+                                <option key={key} value={key}>
+                                  {t('admin.messages.markAs')} {statusLabel}
+                                </option>
+                              );
+                            })}
                           </select>
                         </div>
                       )}
