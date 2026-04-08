@@ -326,12 +326,21 @@ const AdminMessagesTab = () => {
                 }`}
               >
                 {/* Message Header */}
-                <button
+                <div
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
                     setExpandedMessage(isExpanded ? null : message.id);
                     if (!message.read) markAsRead(message.id);
                   }}
-                  className="w-full bg-card p-4 hover:bg-muted/50 transition-colors text-left"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setExpandedMessage(isExpanded ? null : message.id);
+                      if (!message.read) markAsRead(message.id);
+                    }
+                  }}
+                  className="w-full bg-card p-4 hover:bg-muted/50 transition-colors text-left cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
@@ -374,7 +383,7 @@ const AdminMessagesTab = () => {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </button>
+                </div>
 
                 {/* Message Details (Expanded) */}
                 <AnimatePresence>
