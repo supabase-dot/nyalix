@@ -1,14 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
-import { 
-  generateWelcomeEmail, 
-  generateInvoiceEmail, 
-  generateStatusUpdateEmail,
-  generateQuoteRequestEmail,
-  generateQuoteApprovalEmail,
-  getStatusTranslation,
-  getTranslation
-} from '../_shared/emailTemplates.ts'
 
 interface GenerateNotificationRequest {
   event: 'registration' | 'order_placed' | 'order_status_update'
@@ -119,7 +110,7 @@ async function generateNotifications(
       type: 'email',
       event: 'registration',
       recipient: profile.email,
-      subject: getTranslation(profile.language || 'en', 'welcomeEmailSubject'),
+      subject: 'Welcome to Nyalix Medical PVT LTD!',
       message: emailHtml,
       userId
     })
@@ -148,7 +139,7 @@ async function generateNotifications(
       type: 'email',
       event: 'order_placed',
       recipient: profile.email,
-      subject: `${getTranslation(profile.language || 'en', 'orderConfirmationSubject')} - ${orderId}`,
+      subject: `Order Confirmation - ${orderId}`,
       message: emailHtml,
       orderId,
       userId
@@ -191,7 +182,7 @@ async function generateNotifications(
       type: 'email',
       event: 'order_status_update',
       recipient: profile.email,
-      subject: `${getTranslation(profile.language || 'en', 'statusUpdateSubject')} - ${orderId}`,
+      subject: `Order Status Update - ${orderId}`,
       message: emailHtml,
       orderId,
       userId
@@ -228,7 +219,7 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
     </head>
     <body>
       <div class="header">
-        <h1 style="color: #17455a; margin: 0;">Nyalix Global Care</h1>
+        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
         <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Welcome to Our Platform!</h2>
       </div>
       <div class="content">
@@ -374,7 +365,7 @@ function generateInvoiceWhatsApp(profile: ProfileRecord, order: OrderRecord): st
     `${item.product_name} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}`
   ).join('\n') ?? ''
 
-  return `🛍️ *Order Confirmation*\n\nOrder ID: ${order.id}\n\nItems:\n${itemsText}\n\nTotal: $${order.total.toFixed(2)}\n\nShipping to: ${order.shipping_name}, ${order.shipping_address}, ${order.shipping_city}${order.shipping_email ? `, email: ${order.shipping_email}` : ''}${order.shipping_phone ? `, phone: ${order.shipping_phone}` : ''}\n\nThank you for shopping with Nyalix Global Care!`
+  return `🛍️ *Order Confirmation*\n\nOrder ID: ${order.id}\n\nItems:\n${itemsText}\n\nTotal: $${order.total.toFixed(2)}\n\nShipping to: ${order.shipping_name}, ${order.shipping_address}, ${order.shipping_city}${order.shipping_email ? `, email: ${order.shipping_email}` : ''}${order.shipping_phone ? `, phone: ${order.shipping_phone}` : ''}\n\nThank you for shopping with Nyalix Medical PVT LTD!`
 }
 
 function generateStatusUpdateWhatsApp(profile: ProfileRecord, order: OrderRecord): string {
@@ -386,5 +377,5 @@ function generateStatusUpdateWhatsApp(profile: ProfileRecord, order: OrderRecord
     cancelled: 'Your order has been cancelled.'
   }
 
-  return `📦 *Order Status Update*\n\nOrder ID: ${order.id}\n\nStatus: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}\n\nThank you for choosing Nyalix Global Care!`
+  return `📦 *Order Status Update*\n\nOrder ID: ${order.id}\n\nStatus: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}\n\nThank you for choosing Nyalix Medical PVT LTD!`
 }
