@@ -292,7 +292,7 @@ const Profile = () => {
 
   const handleEditMessage = async (messageId: string, newText: string) => {
     if (!newText.trim()) {
-      toast.error('Message cannot be empty');
+      toast.error(t('user.profile.messageSaveFailed'));
       return;
     }
 
@@ -307,18 +307,18 @@ const Profile = () => {
       .eq('id', messageId);
 
     if (error) {
-      toast.error('Failed to update message');
+      toast.error(t('user.profile.messageSaveFailed'));
       return;
     }
 
-    toast.success('Message updated successfully');
+    toast.success(t('user.profile.messageSaveSuccess'));
     setEditingMessage(null);
     setEditingText('');
     fetchMessages();
   };
 
   const handleDeleteMessage = async (messageId: string) => {
-    if (!confirm('Are you sure you want to delete this message?')) return;
+    if (!confirm(t('user.profile.deleteConfirm'))) return;
 
     const { error } = await supabase
       .from('contact_messages')
@@ -326,11 +326,11 @@ const Profile = () => {
       .eq('id', messageId);
 
     if (error) {
-      toast.error('Failed to delete message');
+      toast.error(t('user.profile.messageDeleteFailed'));
       return;
     }
 
-    toast.success('Message deleted');
+    toast.success(t('user.profile.messageDeleteSuccess'));
     fetchMessages();
   };
 
@@ -677,11 +677,11 @@ const Profile = () => {
 
         {/* Messages */}
         <div>
-          <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('user.profile.myMessages') || 'My Messages'}</h2>
+          <h2 className="text-lg font-display font-semibold text-foreground mb-4">{t('user.profile.myMessages')}</h2>
           {messages.length === 0 ? (
             <div className="bg-card rounded-xl border border-border p-8 text-center shadow-luxury">
               <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">{t('user.profile.noMessages') || 'No messages sent yet.'}</p>
+              <p className="text-muted-foreground">{t('user.profile.noMessages')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -715,12 +715,14 @@ const Profile = () => {
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${statusConfig.bg} ${statusConfig.color}`}
                           >
                             <StatusIcon className="w-3 h-3" />
-                            {message.status.charAt(0).toUpperCase() + message.status.slice(1)}
+                            {message.status === 'new' && t('user.profile.pending')}
+                            {message.status === 'replied' && t('user.profile.processing')}
+                            {message.status === 'resolved' && t('user.profile.delivered')}
                           </span>
                           {message.is_edited && (
                             <span className="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded flex items-center gap-1">
                               <Edit2 className="w-3 h-3" />
-                              Edited
+                              {t('user.profile.edited')}
                             </span>
                           )}
                         </div>
@@ -739,7 +741,7 @@ const Profile = () => {
                       <div className="flex items-center gap-2 ml-4">
                         {replies.length > 0 && (
                           <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded">
-                            {replies.length} {replies.length === 1 ? 'reply' : 'replies'}
+                            {replies.length} {replies.length === 1 ? t('user.profile.reply') : t('user.profile.replies')}
                           </span>
                         )}
                         {isExpanded ? (
@@ -774,23 +776,23 @@ const Profile = () => {
                                   onClick={() => handleEditMessage(message.id, editingText)}
                                   className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                                 >
-                                  Save Changes
+                                  {t('user.profile.saveChanges')}
                                 </button>
                                 <button
                                   onClick={() => setEditingMessage(null)}
                                   className="px-4 py-2 bg-muted text-foreground rounded-lg text-sm font-medium hover:bg-border transition-colors"
                                 >
-                                  Cancel
+                                  {t('user.profile.cancel')}
                                 </button>
                               </div>
                             </div>
                           ) : (
                             <div>
-                              <h4 className="text-sm font-semibold text-foreground mb-2">Message</h4>
+                              <h4 className="text-sm font-semibold text-foreground mb-2">{t('user.profile.messageLabel')}</h4>
                               <p className="text-sm text-foreground whitespace-pre-wrap">{message.message}</p>
                               {message.is_edited && (
                                 <p className="text-xs text-muted-foreground mt-2">
-                                  ✏️ Last edited: {message.edited_at ? new Date(message.edited_at).toLocaleDateString() : 'N/A'}
+                                  ✏️ {t('user.profile.lastEdited')}: {message.edited_at ? new Date(message.edited_at).toLocaleDateString() : 'N/A'}
                                 </p>
                               )}
                             </div>
@@ -817,11 +819,11 @@ const Profile = () => {
                           {/* Replies Section */}
                           {replies.length > 0 && (
                             <div className="pt-2 border-t border-border">
-                              <h4 className="text-sm font-semibold text-foreground mb-3">Admin Responses</h4>
+                              <h4 className="text-sm font-semibold text-foreground mb-3">{t('user.profile.adminResponses')}</h4>
                               <div className="space-y-3 bg-card rounded-lg p-3 border border-border">
                                 {replies.map((reply) => (
                                   <div key={reply.id} className="border-l-2 border-accent pl-3">
-                                    <p className="text-xs font-medium text-muted-foreground mb-1">Admin Reply</p>
+                                    <p className="text-xs font-medium text-muted-foreground mb-1">{t('user.profile.adminReplyLabel')}</p>
                                     <p className="text-sm text-foreground whitespace-pre-wrap mb-1">
                                       {reply.reply_text}
                                     </p>
@@ -849,7 +851,7 @@ const Profile = () => {
                                   }}
                                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                                 >
-                                  <Edit2 className="w-4 h-4" /> Edit Message
+                                  <Edit2 className="w-4 h-4" /> {t('user.profile.editMessage')}
                                 </button>
                               )}
                               <button
