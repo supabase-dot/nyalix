@@ -115,8 +115,8 @@ async function sendWhatsApp(to: string, message: string): Promise<boolean> {
   const twilioWhatsAppNumber = Deno.env.get('TWILIO_WHATSAPP_NUMBER')
 
   if (!twilioAccountSid || !twilioAuthToken || !twilioWhatsAppNumber) {
-    console.error('Twilio credentials not set')
-    return false
+    console.log('Twilio credentials not configured, skipping WhatsApp notification')
+    return true // Return true to not fail the notification process
   }
 
   try {

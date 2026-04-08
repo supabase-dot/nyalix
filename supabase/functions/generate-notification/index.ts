@@ -147,7 +147,8 @@ async function generateNotifications(
 
     // WhatsApp message
     const whatsappMessage = generateInvoiceWhatsApp(profile, order)
-    if (profile.phone) {
+    const twilioConfigured = !!(Deno.env.get('TWILIO_ACCOUNT_SID') && Deno.env.get('TWILIO_AUTH_TOKEN') && Deno.env.get('TWILIO_WHATSAPP_NUMBER'))
+    if (profile.phone && twilioConfigured) {
       notifications.push({
         type: 'whatsapp',
         event: 'order_placed',
@@ -190,7 +191,8 @@ async function generateNotifications(
 
     // WhatsApp message
     const whatsappMessage = generateStatusUpdateWhatsApp(profile, order)
-    if (profile.phone) {
+    const twilioConfigured = !!(Deno.env.get('TWILIO_ACCOUNT_SID') && Deno.env.get('TWILIO_AUTH_TOKEN') && Deno.env.get('TWILIO_WHATSAPP_NUMBER'))
+    if (profile.phone && twilioConfigured) {
       notifications.push({
         type: 'whatsapp',
         event: 'order_status_update',
