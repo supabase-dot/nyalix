@@ -109,7 +109,7 @@ const translations = {
     companyName: 'Nyalix Medical PVT LTD',
     copyright: '© 2026 Nyalix Medical PVT LTD. All rights reserved.',
     autoMessage: 'This is an automated message. Please do not reply to this email.',
-    contactEmail: 'info@nyalixmed.com'
+    contactEmail: 'info@nyalix.com'
   },
   ar: {
     welcomeEmailSubject: 'مرحبا بك في Nyalix المتخصصة الطبية!',
@@ -158,7 +158,7 @@ const translations = {
     companyName: 'Nyalix المتخصصة الطبية',
     copyright: '© 2026 Nyalix المتخصصة الطبية. جميع الحقوق محفوظة.',
     autoMessage: 'هذه رسالة آلية. يرجى عدم الرد على هذا البريد الإلكتروني.',
-    contactEmail: 'info@nyalixmed.com'
+    contactEmail: 'info@nyalix.com'
   }
 }
 

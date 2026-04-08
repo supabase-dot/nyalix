@@ -241,7 +241,7 @@ async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClie
             </ul>
             <p>You can now browse our catalog of medical equipment and place orders.</p>
             <a href="https://nyalix.com" class="button">Start Shopping</a>
-            <p>If you have any questions, please contact us at info@nyalixmed.com</p>
+            <p>If you have any questions, please contact us at info@nyalix.com</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -648,7 +648,7 @@ async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof creat
           <div class="footer">
             <div class="footer-content">
               <h3>Need Help?</h3>
-              <p><a href="mailto: info@nyalixmed.com"> info@nyalixmed.com</a></p>
+              <p><a href="mailto: info@nyalix.com"> info@nyalix.com</a></p>
               <p><a href="tel:+917339700569">+917339700569</a></p>
               <p>24/7 Customer Support Available</p>
               <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -715,7 +715,7 @@ async function generateOrderStatusEmail(supabaseClient: ReturnType<typeof create
             <p>Dear ${profile.full_name},</p>
             <div class="status-badge" style="background-color: ${statusColors[status] || '#6c757d'};">Status: ${status.charAt(0).toUpperCase() + status.slice(1)}</div>
             <p>${statusMessages[status] || 'Your order status has been updated.'}</p>
-            <p>If you have any questions, please contact our support team at info@nyalixmed.com</p>
+            <p>If you have any questions, please contact our support team at info@nyalix.com</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -822,7 +822,7 @@ async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof creat
             </div>
 
             <p>Our sales team will respond to your request within 24-48 hours with pricing and availability information.</p>
-            <p>If you have any urgent questions, please contact us at info@nyalixmed.com or call +917339700569.</p>
+            <p>If you have any urgent questions, please contact us at info@nyalix.com or call +917339700569 / +249116648870.</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -887,7 +887,7 @@ async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof cre
             </div>
 
             <p>If this quotation meets your requirements, please let us know and we can proceed with the order.</p>
-            <p>For any questions or to discuss this further, please contact our sales team at info@nyalixmed.com or call +917339700569.</p>
+            <p>For any questions or to discuss this further, please contact our sales team at info@nyalix.com or call +917339700569 / +249116648870.</p>
           </div>
           <div class="footer">
             <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
@@ -1059,8 +1059,8 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
           <div class="footer">
             <div class="footer-content">
               <h3>Need Help?</h3>
-              <p><a href="mailto:info@nyalixmed.com">info@nyalixmed.com</a></p>
-              <p><a href="tel:+917339700569">+917339700569</a></p>
+              <p><a href="mailto:info@nyalix.com">info@nyalix.com</a></p>
+              <p><a href="tel:+917339700569">+917339700569</a> / <a href="tel:+249116648870">+249116648870</a></p>
               <p>24/7 Customer Support Available</p>
               <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
             </div>
@@ -1087,7 +1087,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Nyalix Medical PVT LTD <info@nyalixmed.com>',
+        from: 'Nyalix Medical PVT LTD <info@nyalix.com>',
         to: [to],
         subject,
         html

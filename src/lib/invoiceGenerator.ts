@@ -46,7 +46,7 @@ const invoiceTranslations = {
     dueDate: 'Due Date',
     notes: 'Notes',
     companyName: 'Nyalix Medical PVT LTD',
-    companyEmail: 'info@nyalixmed.com',
+    companyEmail: 'info@nyalix.com',
     companyPhone: '+1234567890',
     paymentMethodDue: 'Due upon receipt',
     footer: '© 2026 Nyalix Medical PVT LTD. All rights reserved.'
@@ -71,7 +71,7 @@ const invoiceTranslations = {
     dueDate: 'تاريخ الاستحقاق',
     notes: 'ملاحظات',
     companyName: 'Nyalix المتخصصة الطبية',
-    companyEmail: 'info@nyalixmed.com',
+    companyEmail: 'info@nyalix.com',
     companyPhone: '+1234567890',
     paymentMethodDue: 'الدفع عند الاستلام',
     footer: '© 2026 Nyalix المتخصصة الطبية. جميع الحقوق محفوظة.'
