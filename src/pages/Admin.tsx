@@ -311,9 +311,44 @@ const Admin = () => {
 
   const deleteProduct = async (id: string) => {
     if (!confirm(t('admin.toast.deleteProductConfirm') || '')) return;
-    await supabase.from('products').delete().eq('id', id);
-    toast.success(t('admin.toast.productDeleted'));
-    fetchProducts();
+
+    try {
+      const orderCountPromise = supabase
+        .from('order_items')
+        .select('id', { count: 'exact', head: true })
+        .eq('product_id', id);
+
+      const quoteCountPromise = supabase
+        .from('quote_requests')
+        .select('id', { count: 'exact', head: true })
+        .eq('product_id', id);
+
+      const [{ count: orderCount, error: orderCountError }, { count: quoteCount, error: quoteCountError }] = await Promise.all([
+        orderCountPromise,
+        quoteCountPromise,
+      ]);
+
+      if (orderCountError) throw orderCountError;
+      if (quoteCountError) throw quoteCountError;
+
+      if ((orderCount ?? 0) > 0 || (quoteCount ?? 0) > 0) {
+        toast.error(t('admin.toast.deleteProductReferenced'));
+        return;
+      }
+
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
+
+      toast.success(t('admin.toast.productDeleted'));
+      fetchProducts();
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : t('admin.toast.deleteProductFailed')
+      );
+    }
   };
 
   // Category Management Functions
