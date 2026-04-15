@@ -596,9 +596,13 @@ const AdminAnalytics: React.FC<Props> = ({ orders, users, products }) => {
                 <div key={p.id} className="px-3 py-2 bg-muted rounded-lg">
                   <p className="font-medium text-sm text-foreground truncate">{p.name}</p>
                   <div className="flex gap-2 text-xs text-muted-foreground mt-1">
-                    <span>${p.price.toLocaleString()}</span>
+                    <span>
+                      {p.price !== undefined && p.price !== null
+                        ? `$${p.price.toLocaleString()}`
+                        : t('products.contactForPrice')}
+                    </span>
                     <span>•</span>
-                    <span>{p.stock_quantity} stock</span>
+                    <span>{p.stock_quantity ?? 0} stock</span>
                     <span>•</span>
                     <span>{p.category}</span>
                   </div>
