@@ -132,9 +132,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </Button>
               </div>
 
-              <div className="flex flex-col lg:flex-row max-h-[calc(90vh-80px)] overflow-y-auto">
+              <div className="flex flex-col lg:flex-row max-h-[calc(90vh-80px)] overflow-hidden">
                 {/* Image Section */}
-                <div className="lg:w-1/2 p-6">
+                <div className="lg:w-1/2 p-6 flex flex-col justify-center bg-muted">
                   <div className="relative aspect-square rounded-lg overflow-hidden bg-muted mb-4">
                     {product?.images && product.images.length > 0 ? (
                       <>
@@ -190,7 +190,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </div>
 
                 {/* Details Section */}
-                <div className="lg:w-1/2 p-6 space-y-6">
+                <div className="lg:w-1/2 p-6 space-y-6 overflow-y-auto flex flex-col">
                   {/* Price */}
                   <div className="text-3xl font-bold text-foreground">
                     ${product?.price.toLocaleString()}
@@ -234,7 +234,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   )}
 
                   {/* Action buttons */}
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex gap-3 pt-4 pb-2 mt-auto sticky bottom-0 bg-card">
                     <Button
                       onClick={handleAddToCart}
                       disabled={!product?.in_stock}
