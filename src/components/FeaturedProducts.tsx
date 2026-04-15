@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -6,6 +7,7 @@ import { ShoppingCart, AlertCircle } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
+import ProductDetailModal from './ProductDetailModal';
 
 const FeaturedProducts = () => {
   const { t } = useTranslation();
@@ -13,6 +15,7 @@ const FeaturedProducts = () => {
   const { addToCart, items } = useCart();
   const { data: products = [], isLoading } = useProducts();
   const featured = products.filter(p => p.featured).slice(0, 4);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const handleAddToCart = (product: typeof featured[0]) => {
     const cartItem = items.find(i => i.product.id === product.id);
@@ -52,7 +55,7 @@ const FeaturedProducts = () => {
             return (
               <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                 className="group bg-card rounded-xl border border-border overflow-hidden shadow-luxury hover:shadow-gold transition-all duration-300">
-                <Link to={`/products/${product.id}`} className="block">
+                <div className="cursor-pointer" onClick={() => setSelectedProductId(product.id)}>
                   <div className="aspect-[4/3] overflow-hidden relative">
                     <img src={product.images?.[0] || '/placeholder.svg'} alt={language === 'ar' ? product.name_ar : product.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -67,16 +70,14 @@ const FeaturedProducts = () => {
                       </div>
                     )}
                   </div>
-                </Link>
+                </div>
                 <div className="p-5">
                   <span className="text-xs font-medium text-gold uppercase tracking-wider">
                     {language === 'ar' ? product.category_ar : product.category}
                   </span>
-                  <Link to={`/products/${product.id}`}>
-                    <h3 className="font-display font-semibold text-foreground mt-1 mb-2 group-hover:text-gold transition-colors">
-                      {language === 'ar' ? product.name_ar : product.name}
-                    </h3>
-                  </Link>
+                  <h3 className="font-display font-semibold text-foreground mt-1 mb-2 group-hover:text-gold transition-colors cursor-pointer" onClick={() => setSelectedProductId(product.id)}>
+                    {language === 'ar' ? product.name_ar : product.name}
+                  </h3>
                   {stockQty > 0 && !isOutOfStock && (
                     <p className={`text-xs mb-2 ${isLowStock ? 'text-orange-500 font-medium' : 'text-muted-foreground'}`}>
                       {isLowStock ? `⚠️ Only ${stockQty} units left` : `✓ ${stockQty} units available`}
@@ -102,6 +103,13 @@ const FeaturedProducts = () => {
             {t('featured.viewAll')}
           </Link>
         </div>
+
+        {/* Product Detail Modal */}
+        <ProductDetailModal
+          isOpen={!!selectedProductId}
+          onClose={() => setSelectedProductId(null)}
+          productId={selectedProductId || ''}
+        />
       </div>
     </section>
   );

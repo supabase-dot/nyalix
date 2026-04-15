@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight, Home } from 'lucide-react';
 import { useProducts } from '@/hooks/useProducts';
 import CategorySidebar from '@/components/CategorySidebar';
+import ProductDetailModal from '@/components/ProductDetailModal';
 
 const Products = () => {
   const { language } = useLanguage();
@@ -14,6 +15,7 @@ const Products = () => {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const categoryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   // Build ordered unique categories
   const categoryMap = new Map<string, { en: string; ar: string; image: string }>();
@@ -145,14 +147,14 @@ const Products = () => {
                             {catProducts.map(product => {
                               const name = language === 'ar' ? product.name_ar : product.name;
                               return (
-                                <Link
+                                <button
                                   key={product.id}
-                                  to={`/products/${product.id}`}
-                                  className="flex items-start gap-1.5 text-sm text-[hsl(210_60%_40%)] hover:text-accent transition-colors group"
+                                  onClick={() => setSelectedProductId(product.id)}
+                                  className="flex items-start gap-1.5 text-sm text-[hsl(210_60%_40%)] hover:text-accent transition-colors group text-left"
                                 >
                                   <ChevronRight className="w-3.5 h-3.5 mt-0.5 shrink-0 text-muted-foreground group-hover:text-accent" />
                                   <span className="leading-snug">{name}</span>
-                                </Link>
+                                </button>
                               );
                             })}
                           </div>
@@ -177,6 +179,13 @@ const Products = () => {
             )}
           </main>
         </div>
+
+        {/* Product Detail Modal */}
+        <ProductDetailModal
+          isOpen={!!selectedProductId}
+          onClose={() => setSelectedProductId(null)}
+          productId={selectedProductId || ''}
+        />
       </div>
     </div>
   );

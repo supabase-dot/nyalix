@@ -31,6 +31,7 @@ import NotFound from "./pages/NotFound";
 import Exhibitions from "./pages/Exhibitions";
 import ExhibitionDetail from "./pages/ExhibitionDetail";
 import Invoice from "./pages/Invoice";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Navbar />
               <main className="min-h-screen pt-28">
                 <Routes>
