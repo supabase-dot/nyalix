@@ -8,6 +8,7 @@ import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 import ProductDetailModal from './ProductDetailModal';
+import QuoteRequestModal from './QuoteRequestModal';
 
 const FeaturedProducts = () => {
   const { t } = useTranslation();
@@ -16,6 +17,7 @@ const FeaturedProducts = () => {
   const { data: products = [], isLoading } = useProducts();
   const featured = products.filter(p => p.featured).slice(0, 4);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [quoteProductId, setQuoteProductId] = useState<string | null>(null);
 
   const handleAddToCart = (product: typeof featured[0]) => {
     const cartItem = items.find(i => i.product.id === product.id);
@@ -84,7 +86,13 @@ const FeaturedProducts = () => {
                     </p>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-foreground">${product.price.toLocaleString()}</span>
+                    {product.price !== undefined && product.price !== null ? (
+                      <span className="text-lg font-bold text-foreground">${product.price.toLocaleString()}</span>
+                    ) : (
+                      <button onClick={() => setQuoteProductId(product.id)} className="text-lg font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
+                        Contact for Price
+                      </button>
+                    )}
                     <button
                       onClick={() => handleAddToCart(product)}
                       disabled={isOutOfStock}
@@ -109,6 +117,13 @@ const FeaturedProducts = () => {
           isOpen={!!selectedProductId}
           onClose={() => setSelectedProductId(null)}
           productId={selectedProductId || ''}
+        />
+
+        {/* Quote Request Modal */}
+        <QuoteRequestModal
+          isOpen={!!quoteProductId}
+          onClose={() => setQuoteProductId(null)}
+          productId={quoteProductId || ''}
         />
       </div>
     </section>

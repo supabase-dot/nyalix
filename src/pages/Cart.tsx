@@ -10,6 +10,7 @@ import { Minus, Plus, Trash2, ShoppingBag, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { generateAndSendNotifications } from '@/lib/notifications';
 import { validatePhone } from '@/lib/validation';
+import QuoteRequestModal from '@/components/QuoteRequestModal';
 
 const Cart = () => {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ const Cart = () => {
   const { user } = useAuth();
   const [step, setStep] = useState<'cart' | 'checkout' | 'success'>('cart');
   const [orderId, setOrderId] = useState('');
+  const [quoteProductId, setQuoteProductId] = useState<string | null>(null);
   const [placing, setPlacing] = useState(false);
   const [checkoutForm, setCheckoutForm] = useState({
     fullName: '',
@@ -99,7 +101,7 @@ const Cart = () => {
       product_id: item.product.id,
       product_name: language === 'ar' ? item.product.name_ar : item.product.name,
       quantity: item.quantity,
-      price: item.product.price * item.quantity,
+      price: (item.product.price ?? 0) * item.quantity,
       product_image_url: item.product.images?.[0] || ''
     }));
 
@@ -171,7 +173,13 @@ const Cart = () => {
                     <img src={item.product.images?.[0] || '/placeholder.svg'} alt={name} className="w-24 h-24 rounded-lg object-cover opacity-100" />
                     <div className="flex-1">
                       <h3 className="font-display font-semibold text-foreground">{name}</h3>
-                      <p className="text-gold font-bold mt-1">${item.product.price.toLocaleString()}</p>
+                      {item.product.price !== undefined && item.product.price !== null ? (
+                        <p className="text-gold font-bold mt-1">${item.product.price.toLocaleString()}</p>
+                      ) : (
+                        <button onClick={() => setQuoteProductId(item.product.id)} className="text-gold font-bold mt-1 hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
+                          Contact for Price
+                        </button>
+                      )}
                       <div className="flex items-center gap-3 mt-2">
                         <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 rounded bg-muted hover:bg-border transition-colors"><Minus className="w-3 h-3" /></button>
                         <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
@@ -251,6 +259,13 @@ const Cart = () => {
           </div>
         }
       </div>
+
+      {/* Quote Request Modal */}
+      <QuoteRequestModal
+        isOpen={!!quoteProductId}
+        onClose={() => setQuoteProductId(null)}
+        productId={quoteProductId || ''}
+      />
     </div>);
 
 };

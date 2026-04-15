@@ -63,7 +63,7 @@ interface Product {
   description_ar: string;
   category: string;
   category_ar: string;
-  price: number;
+  price?: number;
   images: string[];
   in_stock: boolean;
   stock_quantity: number;
@@ -287,7 +287,7 @@ const Admin = () => {
       description_ar: editProduct.description_ar || '',
       category: editProduct.category || '',
       category_ar: editProduct.category_ar || '',
-      price: editProduct.price || 0,
+      price: editProduct.price !== undefined && editProduct.price !== null ? editProduct.price : null,
       images: editProduct.images || [],
       in_stock: editProduct.in_stock ?? true,
       stock_quantity: editProduct.stock_quantity ?? 0,
@@ -779,16 +779,16 @@ const Admin = () => {
                   </div>
                   <form onSubmit={saveProduct} className="space-y-4">
                     {[
-                { key: 'name', label: t('admin.productForm.nameEn'), type: 'text' },
-                { key: 'name_ar', label: t('admin.productForm.nameAr'), type: 'text' },
-                { key: 'price', label: t('admin.productForm.price'), type: 'number' },
-                { key: 'stock_quantity', label: t('admin.productForm.stock'), type: 'number' }].
+                { key: 'name', label: t('admin.productForm.nameEn'), type: 'text', required: true },
+                { key: 'name_ar', label: t('admin.productForm.nameAr'), type: 'text', required: true },
+                { key: 'price', label: t('admin.productForm.price'), type: 'number', required: false },
+                { key: 'stock_quantity', label: t('admin.productForm.stock'), type: 'number', required: true }].
                 map((f) =>
                 <div key={f.key}>
-                        <label className="block text-sm font-medium text-foreground mb-1">{f.label}</label>
-                        <input type={f.type} required min={f.type === 'number' ? 0 : undefined}
+                        <label className="block text-sm font-medium text-foreground mb-1">{f.label} {!f.required && <span className="text-muted-foreground text-xs">(optional)</span>}</label>
+                        <input type={f.type} required={f.required} min={f.type === 'number' ? 0 : undefined}
                   value={editProduct?.[f.key as keyof Product] ?? ''}
-                  onChange={(e) => setEditProduct((prev) => ({ ...prev, [f.key as keyof Product]: f.type === 'number' ? Number(e.target.value) : e.target.value }))}
+                  onChange={(e) => setEditProduct((prev) => ({ ...prev, [f.key as keyof Product]: f.type === 'number' ? (e.target.value === '' ? null : Number(e.target.value)) : e.target.value }))}
                   className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                       </div>
                 )}
@@ -992,7 +992,7 @@ const Admin = () => {
                   <img src={p.images?.[0] || '/placeholder.svg'} alt={p.name} className="w-16 h-16 rounded-lg object-cover" />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground truncate">{p.name}</h3>
-                    <p className="text-sm text-muted-foreground">{p.category} · ${p.price.toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">{p.category} · {p.price !== undefined && p.price !== null ? `$${p.price.toLocaleString()}` : 'Contact for Price'}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Stock</p>

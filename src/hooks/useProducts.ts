@@ -9,7 +9,7 @@ export interface DBProduct {
   description_ar: string;
   category: string;
   category_ar: string;
-  price: number;
+  price?: number;
   images: string[];
   in_stock: boolean;
   stock_quantity: number;

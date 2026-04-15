@@ -7,8 +7,11 @@ import CategorySidebar from '@/components/CategorySidebar';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import QuoteRequestModal from '@/components/QuoteRequestModal';
 
 const CategoryProducts = () => {
+  const { t } = useTranslation();
   const { categoryName } = useParams<{ categoryName: string }>();
   const { language } = useLanguage();
   const { data: products = [], isLoading } = useProducts();
@@ -17,6 +20,7 @@ const CategoryProducts = () => {
   const [activeCategory, setActiveCategory] = useState<string | null>(
     categoryName ? decodeURIComponent(categoryName) : null
   );
+  const [quoteProductId, setQuoteProductId] = useState<string | null>(null);
 
   const decodedCategory = categoryName ? decodeURIComponent(categoryName) : '';
 
@@ -199,7 +203,13 @@ const CategoryProducts = () => {
                             </p>
                           </Link>
                           <div className="flex items-center justify-between gap-1">
-                            <span className="text-sm font-bold text-foreground">${product.price.toLocaleString()}</span>
+                            {product.price !== undefined && product.price !== null ? (
+                              <span className="text-sm font-bold text-foreground">${product.price.toLocaleString()}</span>
+                            ) : (
+                              <button onClick={() => setQuoteProductId(product.id)} className="text-sm font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-1">
+                                Contact Price
+                              </button>
+                            )}
                             <button
                               onClick={() => handleAddToCart(product)}
                               disabled={isOutOfStock}
@@ -218,7 +228,12 @@ const CategoryProducts = () => {
           </main>
         </div>
       </div>
-    </div>
+      {/* Quote Request Modal */}
+      <QuoteRequestModal
+        isOpen={!!quoteProductId}
+        onClose={() => setQuoteProductId(null)}
+        productId={quoteProductId || ''}
+      />    </div>
   );
 };
 

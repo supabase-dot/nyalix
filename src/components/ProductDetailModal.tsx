@@ -192,9 +192,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 {/* Details Section */}
                 <div className="lg:w-1/2 p-6 space-y-6 overflow-y-auto flex flex-col">
                   {/* Price */}
-                  <div className="text-3xl font-bold text-foreground">
-                    ${product?.price.toLocaleString()}
-                  </div>
+                  {product?.price !== undefined && product?.price !== null ? (
+                    <div className="text-3xl font-bold text-foreground">
+                      ${product.price.toLocaleString()}
+                    </div>
+                  ) : (
+                    <button onClick={() => setShowQuoteModal(true)} className="text-2xl font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
+                      Contact for Price
+                    </button>
+                  )}
 
                   {/* Stock status */}
                   {product && (

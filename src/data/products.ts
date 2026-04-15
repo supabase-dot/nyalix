@@ -6,7 +6,7 @@ export interface Product {
   descriptionAr: string;
   category: string;
   categoryAr: string;
-  price: number;
+  price?: number;
   image: string;
   inStock: boolean;
   specifications: Record<string, string>;
