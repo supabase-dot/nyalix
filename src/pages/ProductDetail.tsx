@@ -205,7 +205,7 @@ const ProductDetail = () => {
                 <span className="text-3xl font-bold text-foreground">${product.price.toLocaleString()}</span>
               ) : (
                 <button onClick={() => setShowQuoteModal(true)} className="text-2xl font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
-                  Contact for Price
+                  {t('products.contactForPrice')}
                 </button>
               )}
               <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${product.in_stock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

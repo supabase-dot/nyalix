@@ -992,7 +992,7 @@ const Admin = () => {
                   <img src={p.images?.[0] || '/placeholder.svg'} alt={p.name} className="w-16 h-16 rounded-lg object-cover" />
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-foreground truncate">{p.name}</h3>
-                    <p className="text-sm text-muted-foreground">{p.category} · {p.price !== undefined && p.price !== null ? `$${p.price.toLocaleString()}` : 'Contact for Price'}</p>
+                    <p className="text-sm text-muted-foreground">{p.category} · {p.price !== undefined && p.price !== null ? `$${p.price.toLocaleString()}` : t('products.contactForPrice')}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">Stock</p>

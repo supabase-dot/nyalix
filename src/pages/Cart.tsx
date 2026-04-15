@@ -177,7 +177,7 @@ const Cart = () => {
                         <p className="text-gold font-bold mt-1">${item.product.price.toLocaleString()}</p>
                       ) : (
                         <button onClick={() => setQuoteProductId(item.product.id)} className="text-gold font-bold mt-1 hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
-                          Contact for Price
+                          {t('products.contactForPrice')}
                         </button>
                       )}
                       <div className="flex items-center gap-3 mt-2">

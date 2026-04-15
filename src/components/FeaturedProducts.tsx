@@ -90,7 +90,7 @@ const FeaturedProducts = () => {
                       <span className="text-lg font-bold text-foreground">${product.price.toLocaleString()}</span>
                     ) : (
                       <button onClick={() => setQuoteProductId(product.id)} className="text-lg font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
-                        Contact for Price
+                        {t('products.contactForPrice')}
                       </button>
                     )}
                     <button

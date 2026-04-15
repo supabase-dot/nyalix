@@ -207,7 +207,7 @@ const CategoryProducts = () => {
                               <span className="text-sm font-bold text-foreground">${product.price.toLocaleString()}</span>
                             ) : (
                               <button onClick={() => setQuoteProductId(product.id)} className="text-sm font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-1">
-                                Contact Price
+                                {t('products.contactForPrice')}
                               </button>
                             )}
                             <button

@@ -198,7 +198,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     </div>
                   ) : (
                     <button onClick={() => setShowQuoteModal(true)} className="text-2xl font-bold text-gold hover:text-gold/80 transition-colors cursor-pointer underline underline-offset-2">
-                      Contact for Price
+                      {t('products.contactForPrice')}
                     </button>
                   )}
 
