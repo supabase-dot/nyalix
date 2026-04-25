@@ -28,33 +28,47 @@ const InstagramIcon = () => (
 
 const TopBar = () => {
   const { t } = useTranslation();
+  const phoneNumbers = t('footer.phone'); // "+917339700569 / +249116648870"
+  const primaryPhone = phoneNumbers.split(' / ')[0]; // +917339700569
+  const email = t('footer.emailAddr'); // info@nyalix.com
 
   return (
     <div className="fixed top-0 left-0 right-0 z-40 bg-gray-50 border-b border-gray-200 py-2">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
           {/* Left side: Phone + Email */}
-          <div className="flex items-center gap-4 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              <Phone className="w-4 h-4 text-gray-500" />
-              <span className="hidden sm:inline">{t('footer.phone')}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Mail className="w-4 h-4 text-gray-500" />
-              <span className="hidden sm:inline">{t('footer.emailAddr')}</span>
-            </div>
+          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+            {/* Phone */}
+            <a 
+              href={`tel:${primaryPhone}`}
+              className="flex items-center gap-1 text-gray-600 hover:text-primary transition-colors duration-200 whitespace-nowrap"
+              aria-label="Call us"
+            >
+              <Phone className="w-4 h-4 text-gray-500 hover:text-primary transition-colors flex-shrink-0" />
+              <span className="font-medium">{primaryPhone}</span>
+            </a>
+
+            {/* Email */}
+            <a 
+              href={`mailto:${email}`}
+              className="flex items-center gap-1 text-gray-600 hover:text-primary transition-colors duration-200 whitespace-nowrap"
+              aria-label="Email us"
+            >
+              <Mail className="w-4 h-4 text-gray-500 hover:text-primary transition-colors flex-shrink-0" />
+              <span className="font-medium">{email}</span>
+            </a>
           </div>
 
           {/* Right side: Social icons */}
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 hidden md:inline">{t('contact.followUs')}</span>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="text-xs sm:text-sm text-gray-600 hidden md:inline">{t('contact.followUs')}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <a
                 href="https://www.facebook.com/share/1AX9YpPXPe/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all duration-200"
               >
                 <FacebookIcon />
               </a>
@@ -63,7 +77,7 @@ const TopBar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube"
-                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all duration-200"
               >
                 <YoutubeIcon />
               </a>
@@ -72,7 +86,7 @@ const TopBar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="TikTok"
-                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-black hover:text-white hover:border-black transition-all duration-200"
               >
                 <TiktokIcon />
               </a>
@@ -81,7 +95,7 @@ const TopBar = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="w-8 h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-pink-600 hover:text-white hover:border-pink-600 transition-all duration-200"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white border border-gray-300 flex items-center justify-center text-gray-600 hover:bg-pink-600 hover:text-white hover:border-pink-600 transition-all duration-200"
               >
                 <InstagramIcon />
               </a>
