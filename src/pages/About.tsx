@@ -16,7 +16,7 @@ const ImageCard = (props) => {
   return (
     <div className="overflow-hidden rounded-3xl bg-card border border-border shadow-luxury">
       <div className="w-full min-h-[560px] sm:min-h-[640px] md:min-h-[720px] lg:min-h-[780px] flex items-center justify-center bg-slate-950/5">
-        <img src={src} alt={alt || 'NyaliX image'} loading="lazy" className="max-w-full max-h-full object-contain" />
+        <img src={src} alt={alt || 'Nialix image'} loading="lazy" className="max-w-full max-h-full object-contain" />
       </div>
     </div>
   );
@@ -34,7 +34,7 @@ const About = () => {
             transition={{ duration: 0.6 }}
             className="text-4xl md:text-5xl font-display font-bold text-primary-foreground mb-4"
           >
-            About NyaliX Medical
+            About Nialix  International
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -56,7 +56,7 @@ const About = () => {
             </div>
             <h2 className="text-3xl font-display font-bold text-foreground">Our story is rooted in healthcare innovation.</h2>
             <p className="text-muted-foreground leading-relaxed text-lg">
-              Since our founding, NyaliX Medical has supported hospitals, clinics, and care providers with reliable equipment, fast logistics, and expert guidance. We bring medical-grade solutions to every corner of the region.
+              Since our founding, Nialix  International has supported hospitals, clinics, and care providers with reliable equipment, fast logistics, and expert guidance. We bring medical-grade solutions to every corner of the region.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-3xl bg-card border border-border p-6 shadow-luxury">
@@ -71,7 +71,7 @@ const About = () => {
           </div>
 
           <div className="grid gap-4">
-            <ImageCard src={image1} alt="About NyaliX image 1" caption="Installation overview" />
+            <ImageCard src={image1} alt="About Nialix image 1" caption="Installation overview" />
           </div>
         </section>
 
@@ -106,7 +106,7 @@ const About = () => {
                 viewport={{ once: true }}
                 transition={{ delay: 0.05 * index }}
               >
-                <ImageCard src={src} alt={`NyaliX gallery image ${index + 1}`} />
+                <ImageCard src={src} alt={`Nialix gallery image ${index + 1}`} />
               </motion.div>
             ))}
           </div>

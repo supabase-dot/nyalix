@@ -100,7 +100,7 @@ const statusDisplay = translateStatus('pending', userLanguage)
 
 | Event | English Subject | Arabic Subject |
 |-------|---|---|
-| `registration` | Welcome to Nyalix Medical PVT LTD! | مرحبا بك في Nyalix المتخصصة الطبية! |
+| `registration` | Welcome to Nialix  International Multi-Activities Co.LTD! | مرحبا بك في Nyalix المتخصصة الطبية! |
 | `order_placed` | Order Confirmation - {ID} | تأكيد الطلب - {ID} |
 | `order_status_update` | Order Status Update - {ID} | تحديث حالة الطلب - {ID} |
 | `quote_request` | New Quote Request Received | تم استقبال طلب عرض أسعار جديد |

@@ -288,5 +288,5 @@ The Quote Request feature now fully supports English and Arabic with:
 
 **Implemented by:** AI Assistant  
 **Date:** March 12, 2026  
-**Repository:** Nyalix Medical  
+**Repository:** Nialix  International  
 **Branch:** main
