@@ -62,7 +62,7 @@ const Navbar = () => {
             <img src={nyalixLogo} alt="Nialix  International" className="w-10 h-10 rounded-full object-cover" />
             <div className="hidden sm:block">
               <span className="font-display font-bold text-foreground text-lg leading-none">Nialix</span>
-              <span className="text-[10px] text-muted-foreground block mt-0.5">International Multi-Activities Co.LTD</span>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">Nialix International</span>
             </div>
           </Link>
 
