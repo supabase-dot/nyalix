@@ -1,150 +1,116 @@
-import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Globe, Package, Users, Calendar, Wrench, Plane, Building2, CheckCircle2, Eye, MessageSquare } from 'lucide-react';
+import image1 from '@/assets/image1.jpg';
+import image2 from '@/assets/image2.jpg';
+import image3 from '@/assets/image3.jpg';
+import image4 from '@/assets/image4.jpg';
+import image5 from '@/assets/image5.jpg';
+import image6 from '@/assets/image6.jpg';
+import image7 from '@/assets/image7.jpg';
+import image8 from '@/assets/image8.jpg';
+import image9 from '@/assets/image9.jpg';
+
+const galleryImages = [image1, image2, image3, image4, image5, image6, image7, image8, image9];
+
+const ImageCard = (props) => {
+  const { src, alt } = props;
+  return (
+    <div className="overflow-hidden rounded-3xl bg-card border border-border shadow-luxury">
+      <div className="w-full min-h-[560px] sm:min-h-[640px] md:min-h-[720px] lg:min-h-[780px] flex items-center justify-center bg-slate-950/5">
+        <img src={src} alt={alt || 'NyaliX image'} loading="lazy" className="max-w-full max-h-full object-contain" />
+      </div>
+    </div>
+  );
+};
 
 const About = () => {
-  const { t } = useTranslation();
-
-  const stats = [
-    { icon: Globe, value: "50+", label: t('about.stats.countries') },
-    { icon: Package, value: "200+", label: t('about.stats.products') },
-    { icon: Users, value: "1,500+", label: t('about.stats.clients') },
-    { icon: Calendar, value: "10+", label: t('about.stats.years') },
-  ];
-
-  const services: string[] = t('about.servicesItems', { returnObjects: true }) as string[];
-  const clientsItems: string[] = t('about.clientsItems', { returnObjects: true }) as string[];
-
   return (
     <div className="pt-20 min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-gradient-navy py-16">
+      <div className="bg-gradient-navy py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-primary-foreground mb-2">{t('about.title')}</h1>
-          <p className="text-primary-foreground/70">{t('about.subtitle')}</p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-4xl md:text-5xl font-display font-bold text-primary-foreground mb-4"
+          >
+            About NyaliX Medical
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="max-w-3xl mx-auto text-lg text-primary-foreground/80"
+          >
+            We are a trusted medical equipment supplier committed to improving healthcare delivery with quality products, fast service, and strong local partnerships.
+          </motion.p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 space-y-12">
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-card rounded-xl border border-border p-6 text-center shadow-luxury"
-            >
-              <s.icon className="w-8 h-8 text-gold mx-auto mb-3" />
-              <div className="text-3xl font-display font-bold text-foreground">{s.value}</div>
-              <div className="text-sm text-muted-foreground mt-1">{s.label}</div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* About the Company */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-        >
-          <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-            <Building2 className="w-7 h-7 text-gray-50" />
-          </div>
-          <h2 className="text-2xl font-display font-bold text-foreground mb-3">{t('about.companyTitle')}</h2>
-          <p className="text-muted-foreground leading-relaxed">{t('about.companyText')}</p>
-        </motion.div>
-
-        {/* Vision & Mission side by side */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-          >
-            <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-              <Eye className="w-7 h-7 text-gray-50" />
+      <div className="container mx-auto px-4 py-16 space-y-16">
+        <section className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-start">
+          <div className="space-y-6">
+            <div className="inline-flex items-center justify-center rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-primary/20">
+              Trusted medical supply partner
             </div>
-            <h2 className="text-2xl font-display font-bold text-foreground mb-3">{t('about.vision')}</h2>
-            <p className="text-muted-foreground leading-relaxed">{t('about.visionText')}</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-          >
-            <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-              <MessageSquare className="w-7 h-7 text-gray-50" />
+            <h2 className="text-3xl font-display font-bold text-foreground">Our story is rooted in healthcare innovation.</h2>
+            <p className="text-muted-foreground leading-relaxed text-lg">
+              Since our founding, NyaliX Medical has supported hospitals, clinics, and care providers with reliable equipment, fast logistics, and expert guidance. We bring medical-grade solutions to every corner of the region.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="rounded-3xl bg-card border border-border p-6 shadow-luxury">
+                <p className="text-2xl font-display font-bold text-foreground">12+</p>
+                <p className="text-sm text-muted-foreground mt-2">Years of market experience</p>
+              </div>
+              <div className="rounded-3xl bg-card border border-border p-6 shadow-luxury">
+                <p className="text-2xl font-display font-bold text-foreground">1500+</p>
+                <p className="text-sm text-muted-foreground mt-2">Satisfied healthcare partners</p>
+              </div>
             </div>
-            <h2 className="text-2xl font-display font-bold text-foreground mb-3">{t('about.mission')}</h2>
-            <p className="text-muted-foreground leading-relaxed">{t('about.missionText')}</p>
-          </motion.div>
-        </div>
-
-        {/* Services */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-        >
-          <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-            <Wrench className="w-7 h-7 text-gray-50" />
           </div>
-          <h2 className="text-2xl font-display font-bold text-foreground mb-5">{t('about.services')}</h2>
-          <ul className="space-y-3">
-            {Array.isArray(services) && services.map((item, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-gold mt-0.5 shrink-0" />
-                <span className="text-muted-foreground">{item}</span>
-              </li>
+
+          <div className="grid gap-4">
+            <ImageCard src={image1} alt="About NyaliX image 1" caption="Installation overview" />
+          </div>
+        </section>
+
+        <section className="grid gap-6 sm:grid-cols-3">
+          <div className="rounded-3xl bg-card border border-border p-8 text-center shadow-luxury">
+            <h3 className="text-xl font-semibold text-foreground">Quality first</h3>
+            <p className="text-muted-foreground mt-3 leading-relaxed">
+              We select trusted brands and inspect every shipment to ensure safety and performance.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-card border border-border p-8 text-center shadow-luxury">
+            <h3 className="text-xl font-semibold text-foreground">Local support</h3>
+            <p className="text-muted-foreground mt-3 leading-relaxed">
+              Our team provides in-region service, onboarding, and fast replacements when needed.
+            </p>
+          </div>
+          <div className="rounded-3xl bg-card border border-border p-8 text-center shadow-luxury">
+            <h3 className="text-xl font-semibold text-foreground">Global reach</h3>
+            <p className="text-muted-foreground mt-3 leading-relaxed">
+              From diagnostics to consumables, we deliver to healthcare systems across multiple countries.
+            </p>
+          </div>
+        </section>
+
+        <section className="space-y-8">
+          <div className="grid grid-cols-1 gap-6">
+            {galleryImages.map((src, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.05 * index }}
+              >
+                <ImageCard src={src} alt={`NyaliX gallery image ${index + 1}`} />
+              </motion.div>
             ))}
-          </ul>
-        </motion.div>
-
-        {/* Export Scope + Clients */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-          >
-            <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-              <Plane className="w-7 h-7 text-gray-50" />
-            </div>
-            <h2 className="text-2xl font-display font-bold text-foreground mb-3">{t('about.exportTitle')}</h2>
-            <p className="text-muted-foreground leading-relaxed">{t('about.exportDesc')}</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="bg-card rounded-xl border border-border p-8 shadow-luxury"
-          >
-            <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center mb-5">
-              <Users className="w-7 h-7 text-gray-50" />
-            </div>
-            <h2 className="text-2xl font-display font-bold text-foreground mb-5">{t('about.clientsTitle')}</h2>
-            <ul className="space-y-3">
-              {Array.isArray(clientsItems) && clientsItems.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <CheckCircle2 className="w-5 h-5 text-gold mt-0.5 shrink-0" />
-                  <span className="text-muted-foreground">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </div>
-
+          </div>
+        </section>
       </div>
     </div>
   );

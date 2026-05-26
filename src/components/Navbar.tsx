@@ -8,7 +8,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import nyalixLogo from '@/assets/nyalix-logo.png';
+import nyalixLogo from '@/assets/new-logo.png';
 import ProductsDropdown from './ProductsDropdown';
 import { useCategories } from '@/hooks/useCategories';
 import TopBar from './TopBar';

@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import nyalixLogo from '@/assets/nyalix-logo.png';
+import nyalixLogo from '@/assets/new-logo.png';
 
 /* ── Inline SVG social icons ─────────────────────────────────────── */
 const FacebookIcon = () => (
