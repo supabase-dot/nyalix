@@ -234,7 +234,7 @@ const Contact = () => {
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3499.3!2d77.2367!3d28.5672!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce1a3c0e4f745%3A0x2f5c1437e4e1c8b2!2sLajpat+Nagar%2C+New+Delhi%2C+Delhi!5e0!3m2!1sen!2sin!4v1700000000000"
                 width="100%" height="250" style={{ border: 0 }} allowFullScreen loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade" title="NyaliX Medical Location"
+                referrerPolicy="no-referrer-when-downgrade" title="Nialix  International Location"
               />
             </div>
           </motion.div>

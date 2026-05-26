@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Successfully implemented a comprehensive bilingual email and invoice system for Nyalix Medical PVT LTD that ensures all customer communications are sent in the user's selected language (English or Arabic) with proper RTL/LTR formatting.
+Successfully implemented a comprehensive bilingual email and invoice system for Nialix  International Multi-Activities Co.LTD that ensures all customer communications are sent in the user's selected language (English or Arabic) with proper RTL/LTR formatting.
 
 ## Implementation Status
 
@@ -433,7 +433,7 @@ const arabic = translateStatus('pending', 'ar')
 
 ## Conclusion
 
-The bilingual email and invoice system for Nyalix Medical PVT LTD is **complete and ready for production**. The implementation provides:
+The bilingual email and invoice system for Nialix  International Multi-Activities Co.LTD is **complete and ready for production**. The implementation provides:
 
 ✅ **Full bilingual support** (English & Arabic)  
 ✅ **Proper RTL/LTR formatting** for email clients  

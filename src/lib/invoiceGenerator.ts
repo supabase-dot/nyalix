@@ -45,11 +45,11 @@ const invoiceTranslations = {
     paymentTerms: 'Payment Terms',
     dueDate: 'Due Date',
     notes: 'Notes',
-    companyName: 'Nyalix Medical PVT LTD',
+    companyName: 'Nialix  International Multi-Activities Co.LTD',
     companyEmail: 'info@nyalix.com',
     companyPhone: '+1234567890',
     paymentMethodDue: 'Due upon receipt',
-    footer: '© 2026 Nyalix Medical PVT LTD. All rights reserved.'
+    footer: '© 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.'
   },
   ar: {
     invoice: 'الفاتورة',
@@ -70,11 +70,11 @@ const invoiceTranslations = {
     paymentTerms: 'شروط الدفع',
     dueDate: 'تاريخ الاستحقاق',
     notes: 'ملاحظات',
-    companyName: 'Nyalix المتخصصة الطبية',
+    companyName: 'شركة نياليكس الدولية متعددة الأنشطة ذ.م.م',
     companyEmail: 'info@nyalix.com',
     companyPhone: '+1234567890',
     paymentMethodDue: 'الدفع عند الاستلام',
-    footer: '© 2026 Nyalix المتخصصة الطبية. جميع الحقوق محفوظة.'
+    footer: '© 2026 شركة نياليكس الدولية متعددة الأنشطة ذ.م.م. جميع الحقوق محفوظة.'
   }
 }
 

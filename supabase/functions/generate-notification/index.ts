@@ -110,7 +110,7 @@ async function generateNotifications(
       type: 'email',
       event: 'registration',
       recipient: profile.email,
-      subject: 'Welcome to Nyalix Medical PVT LTD!',
+      subject: 'Welcome to Nialix  International Multi-Activities Co.LTD!',
       message: emailHtml,
       userId
     })
@@ -221,12 +221,12 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
     </head>
     <body>
       <div class="header">
-        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
+        <h1 style="color: #17455a; margin: 0;">Nialix  International Multi-Activities Co.LTD</h1>
         <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Welcome to Our Platform!</h2>
       </div>
       <div class="content">
         <h2>Dear ${profile.full_name},</h2>
-        <p>Thank you for registering with Nyalix Medical PVT LTD! We're excited to have you as part of our community.</p>
+        <p>Thank you for registering with Nialix  International Multi-Activities Co.LTD! We're excited to have you as part of our community.</p>
         <p>Your account has been successfully created with the following details:</p>
         <ul>
           <li><strong>Name:</strong> ${profile.full_name}</li>
@@ -237,7 +237,7 @@ function generateWelcomeEmail(profile: ProfileRecord): string {
         <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
         <p>This is an automated welcome message. Please do not reply to this email.</p>
       </div>
     </body>
@@ -272,7 +272,7 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
     </head>
     <body>
       <div class="header">
-        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
+        <h1 style="color: #17455a; margin: 0;">Nialix  International Multi-Activities Co.LTD</h1>
         <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Order Invoice</h2>
       </div>
       <div class="content">
@@ -312,7 +312,7 @@ function generateInvoiceEmail(profile: ProfileRecord, order: OrderRecord): strin
         <p>If you have any questions, please contact us at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
         <p>This is an automated invoice. Please do not reply to this email.</p>
       </div>
     </body>
@@ -343,7 +343,7 @@ function generateStatusUpdateEmail(profile: ProfileRecord, order: OrderRecord): 
     </head>
     <body>
       <div class="header">
-        <h1 style="color: #17455a; margin: 0;">Nyalix Medical PVT LTD</h1>
+        <h1 style="color: #17455a; margin: 0;">Nialix  International Multi-Activities Co.LTD</h1>
         <h2 style="color: #666; margin: 5px 0 0 0; font-size: 16px;">Order Status Update</h2>
       </div>
       <div class="content">
@@ -354,7 +354,7 @@ function generateStatusUpdateEmail(profile: ProfileRecord, order: OrderRecord): 
         <p>If you have any questions, please contact our support team at info@nyalix.com</p>
       </div>
       <div class="footer">
-        <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+        <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
         <p>This is an automated message. Please do not reply to this email.</p>
       </div>
     </body>
@@ -367,7 +367,7 @@ function generateInvoiceWhatsApp(profile: ProfileRecord, order: OrderRecord): st
     `${item.product_name} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}`
   ).join('\n') ?? ''
 
-  return `🛍️ *Order Confirmation*\n\nOrder ID: ${order.id}\n\nItems:\n${itemsText}\n\nTotal: $${order.total.toFixed(2)}\n\nShipping to: ${order.shipping_name}, ${order.shipping_address}, ${order.shipping_city}${order.shipping_email ? `, email: ${order.shipping_email}` : ''}${order.shipping_phone ? `, phone: ${order.shipping_phone}` : ''}\n\nThank you for shopping with Nyalix Medical PVT LTD!`
+  return `🛍️ *Order Confirmation*\n\nOrder ID: ${order.id}\n\nItems:\n${itemsText}\n\nTotal: $${order.total.toFixed(2)}\n\nShipping to: ${order.shipping_name}, ${order.shipping_address}, ${order.shipping_city}${order.shipping_email ? `, email: ${order.shipping_email}` : ''}${order.shipping_phone ? `, phone: ${order.shipping_phone}` : ''}\n\nThank you for shopping with Nialix  International Multi-Activities Co.LTD!`
 }
 
 function generateStatusUpdateWhatsApp(profile: ProfileRecord, order: OrderRecord): string {
@@ -379,5 +379,5 @@ function generateStatusUpdateWhatsApp(profile: ProfileRecord, order: OrderRecord
     cancelled: 'Your order has been cancelled.'
   }
 
-  return `📦 *Order Status Update*\n\nOrder ID: ${order.id}\n\nStatus: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}\n\nThank you for choosing Nyalix Medical PVT LTD!`
+  return `📦 *Order Status Update*\n\nOrder ID: ${order.id}\n\nStatus: ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}\n\n${statusMessages[order.status as keyof typeof statusMessages] || 'Your order status has been updated.'}\n\nThank you for choosing Nialix  International Multi-Activities Co.LTD!`
 }

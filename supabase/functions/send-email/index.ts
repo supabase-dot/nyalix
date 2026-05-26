@@ -163,14 +163,14 @@ function generateInvitationEmail(data: { email: string; invitation_url: string }
   const { email, invitation_url } = data
 
   return {
-    subject: 'You\'re invited to join Nyalix Medical PVT LTD',
+    subject: 'You\'re invited to join Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>You're invited to join Nyalix Medical PVT LTD</title>
+        <title>You're invited to join Nialix  International Multi-Activities Co.LTD</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
@@ -183,21 +183,21 @@ function generateInvitationEmail(data: { email: string; invitation_url: string }
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <p>Medical Equipment Excellence</p>
           </div>
           <div class="content">
             <h2>You've been invited!</h2>
             <p>Hello,</p>
-            <p>You've been invited to join Nyalix Medical PVT LTD platform. Click the button below to accept your invitation and set up your account.</p>
+            <p>You've been invited to join Nialix  International Multi-Activities Co.LTD platform. Click the button below to accept your invitation and set up your account.</p>
             <a href="${invitation_url}" class="button">Accept Invitation</a>
             <p>If the button doesn't work, copy and paste this link into your browser:</p>
             <p><a href="${invitation_url}">${invitation_url}</a></p>
             <p>This invitation will expire in 7 days.</p>
-            <p>Best regards,<br>The Nyalix Medical PVT LTD Team</p>
+            <p>Best regards,<br>The Nialix  International Multi-Activities Co.LTD Team</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated invitation. Please do not reply to this email.</p>
           </div>
         </div>
@@ -217,14 +217,14 @@ async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClie
   if (error || !profile) return null
 
   return {
-    subject: 'Welcome to Nyalix Medical PVT LTD!',
+    subject: 'Welcome to Nialix  International Multi-Activities Co.LTD!',
     html: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Nyalix Medical PVT LTD</title>
+        <title>Welcome to Nialix  International Multi-Activities Co.LTD</title>
         <style>
           body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
@@ -237,12 +237,12 @@ async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClie
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <p>Welcome to Our Platform</p>
           </div>
           <div class="content">
             <h2>Welcome, ${profile.full_name}!</h2>
-            <p>Thank you for joining Nyalix Medical PVT LTD! We're excited to have you as part of our community.</p>
+            <p>Thank you for joining Nialix  International Multi-Activities Co.LTD! We're excited to have you as part of our community.</p>
             <p>Your account has been successfully created with the following details:</p>
             <ul>
               <li><strong>Name:</strong> ${profile.full_name}</li>
@@ -254,7 +254,7 @@ async function generateWelcomeEmail(supabaseClient: ReturnType<typeof createClie
             <p>If you have any questions, please contact us at info@nyalix.com</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated welcome message. Please do not reply to this email.</p>
           </div>
         </div>
@@ -534,7 +534,7 @@ async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof creat
         <div class="email-container">
           <!-- Header -->
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Order Confirmation</h2>
           </div>
 
@@ -650,7 +650,7 @@ async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof creat
             <a href="https://nyalix.com/orders/${order.id}" class="cta-button">View Order Details</a>
             <a href="https://nyalix.com/track-order" class="cta-button">Track Your Order</a>
             <p style="margin-top: 20px; color: #6c757d; font-size: 14px;">
-              Thank you for choosing Nyalix Medical PVT LTD for your medical equipment needs!
+              Thank you for choosing Nialix  International Multi-Activities Co.LTD for your medical equipment needs!
             </p>
           </div>
 
@@ -661,7 +661,7 @@ async function generateOrderInvoiceEmail(supabaseClient: ReturnType<typeof creat
               <p><a href="mailto: info@nyalix.com"> info@nyalix.com</a></p>
               <p><a href="tel:+917339700569">+917339700569</a></p>
               <p>24/7 Customer Support Available</p>
-              <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+              <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -717,7 +717,7 @@ async function generateOrderStatusEmail(supabaseClient: ReturnType<typeof create
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Order Status Update</h2>
           </div>
           <div class="content">
@@ -728,7 +728,7 @@ async function generateOrderStatusEmail(supabaseClient: ReturnType<typeof create
             <p>If you have any questions, please contact our support team at info@nyalix.com</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated status update. Please do not reply to this email.</p>
           </div>
         </div>
@@ -742,7 +742,7 @@ function generatePasswordResetEmail(data: { reset_url: string }): { subject: str
   const { reset_url } = data
 
   return {
-    subject: 'Reset your Nyalix Medical PVT LTD password',
+    subject: 'Reset your Nialix  International Multi-Activities Co.LTD password',
     html: `
       <!DOCTYPE html>
       <html>
@@ -762,12 +762,12 @@ function generatePasswordResetEmail(data: { reset_url: string }): { subject: str
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <p>Password Reset</p>
           </div>
           <div class="content">
             <h2>Reset Your Password</h2>
-            <p>You requested a password reset for your Nyalix Medical PVT LTD account.</p>
+            <p>You requested a password reset for your Nialix  International Multi-Activities Co.LTD account.</p>
             <p>Click the button below to reset your password:</p>
             <a href="${reset_url}" class="button">Reset Password</a>
             <p>If the button doesn't work, copy and paste this link into your browser:</p>
@@ -776,7 +776,7 @@ function generatePasswordResetEmail(data: { reset_url: string }): { subject: str
             <p>If you didn't request this password reset, please ignore this email.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated password reset email. Please do not reply to this email.</p>
           </div>
         </div>
@@ -796,7 +796,7 @@ async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof creat
   if (error || !quote) return null
 
   return {
-    subject: 'Quote Request Received - Nyalix Medical PVT LTD',
+    subject: 'Quote Request Received - Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
@@ -816,7 +816,7 @@ async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof creat
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Quote Request Received</h2>
           </div>
           <div class="content">
@@ -835,7 +835,7 @@ async function generateQuotePendingEmail(supabaseClient: ReturnType<typeof creat
             <p>If you have any urgent questions, please contact us at info@nyalix.com or call +917339700569 / +249116648870.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated confirmation. Please do not reply to this email.</p>
           </div>
         </div>
@@ -855,7 +855,7 @@ async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof cre
   if (error || !quote) return null
 
   return {
-    subject: 'Quote Response - Nyalix Medical PVT LTD',
+    subject: 'Quote Response - Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
@@ -876,7 +876,7 @@ async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof cre
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Quote Response</h2>
           </div>
           <div class="content">
@@ -900,7 +900,7 @@ async function generateQuoteRespondedEmail(supabaseClient: ReturnType<typeof cre
             <p>For any questions or to discuss this further, please contact our sales team at info@nyalix.com or call +917339700569 / +249116648870.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated response. Please do not reply to this email.</p>
           </div>
         </div>
@@ -978,7 +978,7 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
         <div class="email-container">
           <!-- Header -->
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Invoice</h2>
           </div>
 
@@ -1061,7 +1061,7 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
             <a href="https://nyalix.com/checkout?quote=${quote.id}" class="cta-button">Complete Purchase</a>
             <a href="https://nyalix.com/contact" class="cta-button">Contact Support</a>
             <p style="margin-top: 20px; color: #6c757d; font-size: 14px;">
-              Thank you for choosing Nyalix Medical PVT LTD for your medical equipment needs!
+              Thank you for choosing Nialix  International Multi-Activities Co.LTD for your medical equipment needs!
             </p>
           </div>
 
@@ -1072,7 +1072,7 @@ async function generateQuoteApprovedEmail(supabaseClient: ReturnType<typeof crea
               <p><a href="mailto:info@nyalix.com">info@nyalix.com</a></p>
               <p><a href="tel:+917339700569">+917339700569</a> / <a href="tel:+249116648870">+249116648870</a></p>
               <p>24/7 Customer Support Available</p>
-              <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+              <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             </div>
           </div>
         </div>
@@ -1086,7 +1086,7 @@ function generateContactSubmittedEmail(data: Record<string, unknown>): { subject
   const name = (data?.name as string) || 'Valued Customer'
 
   return {
-    subject: 'Message Received - Nyalix Medical PVT LTD',
+    subject: 'Message Received - Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
@@ -1106,12 +1106,12 @@ function generateContactSubmittedEmail(data: Record<string, unknown>): { subject
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Thank You for Contacting Us</h2>
           </div>
           <div class="content">
             <h3>Dear ${name},</h3>
-            <p>We have received your message and appreciate you taking the time to contact Nyalix Medical PVT LTD.</p>
+            <p>We have received your message and appreciate you taking the time to contact Nialix  International Multi-Activities Co.LTD.</p>
             
             <div class="message-info">
               <p><strong>What happens next?</strong></p>
@@ -1129,7 +1129,7 @@ function generateContactSubmittedEmail(data: Record<string, unknown>): { subject
             <p>Thank you for your patience!</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated confirmation. Please do not reply to this email.</p>
           </div>
         </div>
@@ -1143,7 +1143,7 @@ function generateContactRepliedEmail(data: Record<string, unknown>): { subject: 
   const reply = ((data?.reply || '') as string).substring(0, 200) || 'Thank you for reaching out.'
 
   return {
-    subject: 'We\'ve Replied to Your Message - Nyalix Medical PVT LTD',
+    subject: 'We\'ve Replied to Your Message - Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
@@ -1164,7 +1164,7 @@ function generateContactRepliedEmail(data: Record<string, unknown>): { subject: 
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>New Reply to Your Message</h2>
           </div>
           <div class="content">
@@ -1181,7 +1181,7 @@ function generateContactRepliedEmail(data: Record<string, unknown>): { subject: 
             <p>If you have any follow-up questions, feel free to reply directly through your dashboard.</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated notification. Please do not reply to this email.</p>
           </div>
         </div>
@@ -1193,7 +1193,7 @@ function generateContactRepliedEmail(data: Record<string, unknown>): { subject: 
 
 function generateContactResolvedEmail(data: Record<string, unknown>): { subject: string; html: string } {
   return {
-    subject: 'Your Message Has Been Resolved - Nyalix Medical PVT LTD',
+    subject: 'Your Message Has Been Resolved - Nialix  International Multi-Activities Co.LTD',
     html: `
       <!DOCTYPE html>
       <html>
@@ -1213,7 +1213,7 @@ function generateContactResolvedEmail(data: Record<string, unknown>): { subject:
       <body>
         <div class="container">
           <div class="header">
-            <h1>Nyalix Medical PVT LTD</h1>
+            <h1>Nialix  International Multi-Activities Co.LTD</h1>
             <h2>Message Resolved</h2>
           </div>
           <div class="content">
@@ -1221,7 +1221,7 @@ function generateContactResolvedEmail(data: Record<string, unknown>): { subject:
             
             <div class="resolved-box">
               <p><strong style="color: #28a745;">✓ Status: Resolved</strong></p>
-              <p>Thank you for contacting Nyalix Medical PVT LTD. Our team has successfully addressed your inquiry.</p>
+              <p>Thank you for contacting Nialix  International Multi-Activities Co.LTD. Our team has successfully addressed your inquiry.</p>
             </div>
 
             <p>You can view the complete conversation history in your profile dashboard, where all messages and replies are maintained for your reference.</p>
@@ -1236,7 +1236,7 @@ function generateContactResolvedEmail(data: Record<string, unknown>): { subject:
             <p>We appreciate your business and look forward to serving you again!</p>
           </div>
           <div class="footer">
-            <p>&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p>&copy; 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.</p>
             <p>This is an automated notification. Please do not reply to this email.</p>
           </div>
         </div>
@@ -1261,7 +1261,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<boo
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'Nyalix Medical PVT LTD <info@nyalix.com>',
+        from: 'Nialix  International Multi-Activities Co.LTD <info@nyalix.com>',
         to: [to],
         subject,
         html

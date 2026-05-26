@@ -162,7 +162,7 @@ const translatedStatus = translateStatus('pending', userLanguage)
 #### 1. **Welcome Email** (`registration` event)
 - Sent when user registers
 - Contains account confirmation and catalog introduction
-- **EN Subject:** "Welcome to Nyalix Medical PVT LTD!"
+- **EN Subject:** "Welcome to Nialix  International Multi-Activities Co.LTD!"
 - **AR Subject:** "مرحبا بك في Nyalix المتخصصة الطبية!"
 
 #### 2. **Order Confirmation Email** (`order_placed` event)

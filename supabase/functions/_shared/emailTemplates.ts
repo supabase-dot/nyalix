@@ -63,10 +63,10 @@ const statusTranslations = {
 
 const translations = {
   en: {
-    welcomeEmailSubject: 'Welcome to Nyalix Medical PVT LTD!',
+    welcomeEmailSubject: 'Welcome to Nialix  International Multi-Activities Co.LTD!',
     welcomeEmailTitle: 'Welcome to Our Platform!',
     welcomeEmailGreeting: 'Dear',
-    welcomeEmailMessage: 'Thank you for registering with Nyalix Medical PVT LTD! We\'re excited to have you as part of our community.',
+    welcomeEmailMessage: 'Thank you for registering with Nialix  International Multi-Activities Co.LTD! We\'re excited to have you as part of our community.',
     welcomeEmailDetails: 'Your account has been successfully created with the following details:',
     welcomeEmailName: 'Name',
     welcomeEmailEmail: 'Email',
@@ -106,16 +106,16 @@ const translations = {
     quoteApprovalSubject: 'Quote Approved & Invoice Ready',
     quoteApprovalTitle: 'Your Quote Has Been Approved',
     quoteApprovalInvoiceReady: 'Your quote has been approved. Please find your invoice attached.',
-    companyName: 'Nyalix Medical PVT LTD',
-    copyright: '© 2026 Nyalix Medical PVT LTD. All rights reserved.',
+    companyName: 'Nialix  International Multi-Activities Co.LTD',
+    copyright: '© 2026 Nialix  International Multi-Activities Co.LTD. All rights reserved.',
     autoMessage: 'This is an automated message. Please do not reply to this email.',
     contactEmail: 'info@nyalix.com'
   },
   ar: {
-    welcomeEmailSubject: 'مرحبا بك في Nyalix المتخصصة الطبية!',
+    welcomeEmailSubject: 'مرحبا بك في شركة نياليكس الدولية متعددة الأنشطة ذ.م.م!',
     welcomeEmailTitle: 'مرحبا بك في منصتنا!',
     welcomeEmailGreeting: 'عزيزي',
-    welcomeEmailMessage: 'شكراً لتسجيلك مع Nyalix المتخصصة الطبية! نحن متحمسون لوجودك معنا.',
+    welcomeEmailMessage: 'شكراً لتسجيلك مع شركة نياليكس الدولية متعددة الأنشطة ذ.م.م! نحن متحمسون لوجودك معنا.',
     welcomeEmailDetails: 'تم إنشاء حسابك بنجاح ببيانات :',
     welcomeEmailName: 'الاسم',
     welcomeEmailEmail: 'البريد الإلكتروني',
@@ -155,8 +155,8 @@ const translations = {
     quoteApprovalSubject: 'تم الموافقة على العرض والفاتورة جاهزة',
     quoteApprovalTitle: 'تمت الموافقة على عرضك',
     quoteApprovalInvoiceReady: 'تمت الموافقة على عرضك. يرجى العثور على فاتورتك في المرفق.',
-    companyName: 'Nyalix المتخصصة الطبية',
-    copyright: '© 2026 Nyalix المتخصصة الطبية. جميع الحقوق محفوظة.',
+    companyName: 'شركة نياليكس الدولية متعددة الأنشطة ذ.م.م',
+    copyright: '© 2026 شركة نياليكس الدولية متعددة الأنشطة ذ.م.م. جميع الحقوق محفوظة.',
     autoMessage: 'هذه رسالة آلية. يرجى عدم الرد على هذا البريد الإلكتروني.',
     contactEmail: 'info@nyalix.com'
   }
