@@ -61,8 +61,8 @@ const Navbar = () => {
           <Link to="/" className="flex items-center gap-2 shrink-0">
             <img src={nyalixLogo} alt="Nialix  International" className="w-10 h-10 rounded-full object-cover" />
             <div className="hidden sm:block">
-              <span className="font-display font-bold text-foreground text-lg leading-none">Nialix</span>
-              <span className="text-[10px] text-muted-foreground block mt-0.5">Nialix International</span>
+              <span className="font-display font-bold text-foreground text-lg leading-none">Nialix International</span>
+              <span className="text-[10px] text-muted-foreground block mt-0.5">Multi-Activities Co.LTDl</span>
             </div>
           </Link>
 
