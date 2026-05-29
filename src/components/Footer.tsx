@@ -65,8 +65,9 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={nyalixLogo} alt="NyaliX Medical" className="w-10 h-10 rounded-full object-cover" />
-              <span className="font-display font-bold text-xl">NyaliX Medical</span>
+              <img src={nyalixLogo} alt="Nialix International" className="w-10 h-10 rounded-full object-cover" />
+              <span className="font-display font-bold text-xl">Nialix International</span>
+              
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-5">{t('footer.description')}</p>
 
@@ -179,7 +180,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/10 mt-12 pt-6 text-center text-sm text-primary-foreground/50">
-          © {new Date().getFullYear()} NyaliX Medical PVT LTD. {t('footer.rights')}
+          © {new Date().getFullYear()} Nialix International Multi-Activities Co.LTD. {t('footer.rights')}
         </div>
       </div>
     </footer>
