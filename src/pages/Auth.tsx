@@ -16,15 +16,18 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({ email: '', password: '', fullName: '', phone: '', country: '' });
-  const [errors, setErrors] = useState({ phone: '', password: '' });
+  const [errors, setErrors] = useState({ phone: '', password: '', email: '' });
 
   // Clear errors when mode changes
   useEffect(() => {
-    setErrors({ phone: '', password: '' });
+    setErrors({ phone: '', password: '', email: '' });
   }, [mode]);
 
   const validateFormField = (field: string, value: string) => {
-    if (field === 'phone') {
+    if (field === 'email') {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setErrors(prev => ({ ...prev, email: emailRegex.test(value) ? '' : 'Please enter a valid email address' }));
+    } else if (field === 'phone') {
       const result = validatePhone(value);
       setErrors(prev => ({ ...prev, phone: result.isValid ? '' : result.message || '' }));
     } else if (field === 'password' && mode === 'signup') {
@@ -35,7 +38,7 @@ const Auth = () => {
 
   const handleInputChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
-    if (field === 'phone' || (field === 'password' && mode === 'signup')) {
+    if (field === 'email' || field === 'phone' || (field === 'password' && mode === 'signup')) {
       validateFormField(field, value);
     }
   };
@@ -67,12 +70,15 @@ const Auth = () => {
     }
 
     if (mode === 'signup') {
-      // Validate before submitting
+      // Validate all fields before submitting
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailValid = emailRegex.test(form.email);
       const phoneValidation = validatePhone(form.phone);
       const passwordValidation = validatePassword(form.password);
 
-      if (!phoneValidation.isValid || !passwordValidation.isValid) {
+      if (!emailValid || !phoneValidation.isValid || !passwordValidation.isValid) {
         setErrors({
+          email: emailValid ? '' : 'Please enter a valid email address',
           phone: phoneValidation.isValid ? '' : phoneValidation.message || '',
           password: passwordValidation.isValid ? '' : passwordValidation.message || ''
         });
@@ -82,7 +88,14 @@ const Auth = () => {
 
       const { error } = await signUp(form.email, form.password, form.fullName, form.phone, form.country);
       setLoading(false);
-      if (error) {toast.error(error.message);return;}
+      if (error) {
+        // Handle duplicate email error
+        if (error.message?.includes('already registered') || error.message?.includes('duplicate')) {
+          setErrors(prev => ({ ...prev, email: 'Email already registered. Please use a different email or try logging in.' }));
+        }
+        toast.error(error.message);
+        return;
+      }
       toast.success('Account created! Please check your email to verify your account.');
       setMode('login');
       return;
@@ -146,8 +159,9 @@ const Auth = () => {
             <div className="space-y-1">
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input type="email" required placeholder="Email" value={form.email} onChange={(e) => handleInputChange('email', e.target.value)} className={inputClass()} />
+                <input type="email" required placeholder="Email" value={form.email} onChange={(e) => handleInputChange('email', e.target.value)} className={inputClass('email')} />
               </div>
+              {errors.email && <p className="text-red-500 text-sm mt-1 ml-1">{errors.email}</p>}
             </div>
 
             {mode !== 'forgot' &&

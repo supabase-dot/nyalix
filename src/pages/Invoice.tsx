@@ -90,7 +90,7 @@ const Invoice = () => {
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold">Nyalix Medical PVT LTD</h1>
+              <h1 className="text-3xl font-bold">Nialix International Multi-Activities Co.LTD</h1>
               <p className="text-blue-100">Medical Equipment Excellence</p>
             </div>
             <button
@@ -190,9 +190,9 @@ const Invoice = () => {
         {/* Footer */}
         <div className="bg-gray-100 px-8 py-6">
           <div className="text-center text-gray-600">
-            <p className="font-semibold mb-2">Thank you for choosing Nyalix Medical PVT LTD</p>
+            <p className="font-semibold mb-2">Thank you for choosing Nialix International Multi-Activities Co.LTD</p>
             <p>For any questions, please contact us at info@nyalix.com or call +971 50 123 4567</p>
-            <p className="text-sm mt-4">&copy; 2026 Nyalix Medical PVT LTD. All rights reserved.</p>
+            <p className="text-sm mt-4">&copy; 2026 Nialix International Multi-Activities Co.LTD. All rights reserved.</p>
           </div>
         </div>
       </div>

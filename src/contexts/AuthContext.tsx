@@ -84,6 +84,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const signUp = async (email: string, password: string, fullName: string, phone: string, country: string) => {
+    // Check if email already exists in profiles table
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('email')
+      .ilike('email', email)
+      .maybeSingle();
+
+    if (existingProfile) {
+      return { error: new Error('Email already registered. Please use a different email or try logging in.') as AuthError };
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
