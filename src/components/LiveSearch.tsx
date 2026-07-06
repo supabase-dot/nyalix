@@ -85,7 +85,7 @@ const LiveSearch = () => {
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{displayName}</span>
                       <span className="text-xs text-muted-foreground">
-                        ${p.price.toFixed(2)}
+                        {p.price != null ? `$${p.price.toFixed(2)}` : '—'}
                       </span>
                     </div>
                   </li>
