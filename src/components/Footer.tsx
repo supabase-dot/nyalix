@@ -64,10 +64,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src={nyalixLogo} alt="Nialix International" className="w-10 h-10 rounded-full object-cover" />
-              <span className="font-display font-bold text-xl">Nialix International</span>
-              
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/20 bg-white/95 p-1 shadow-sm overflow-hidden">
+                <img src={nyalixLogo} alt="Nialix International" className="h-full w-full object-cover" />
+              </div>
+              <div className="leading-tight text-white">
+                <div className="font-display font-extrabold text-lg tracking-tight">Nialix International</div>
+                <div className="text-[10px] font-semibold text-white/80">Multi-Activities Co.LTD</div>
+              </div>
             </div>
             <p className="text-primary-foreground/70 text-sm leading-relaxed mb-5">{t('footer.description')}</p>
 

@@ -58,11 +58,13 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20 gap-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img src={nyalixLogo} alt="Nialix International" className="w-10 h-10 rounded-full object-cover" />
-            <div className="hidden sm:block">
-              <span className="font-display font-bold text-foreground text-lg leading-none">Nialix International</span>
-              <span className="text-[10px] text-muted-foreground block mt-0.5"> Multi-Activities Co.LTD</span>
+          <Link to="/" className="flex items-center gap-2.5 shrink-0">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-slate-200 bg-white p-1 shadow-sm ring-1 ring-slate-100 overflow-hidden">
+              <img src={nyalixLogo} alt="Nialix International" className="h-full w-full object-cover" />
+            </div>
+            <div className="hidden sm:block leading-tight">
+              <div className="font-display font-extrabold text-foreground text-[1rem] tracking-tight">Nialix International</div>
+              <div className="text-[10px] font-semibold text-slate-700">Multi-Activities Co.LTD</div>
             </div>
           </Link>
 
